@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -23,26 +24,22 @@ public class AuthController {
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest req) {
         try {
             var data = authService.register(req);
-            return ResponseEntity.status(HttpStatus.CREATED).body(
-                Map.of(
-                    "success", true,
-                    "data", data,
-                    "error", null,
-                    "timestamp", Instant.now()
-                )
-            );
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("data", data);
+            response.put("error", null);
+            response.put("timestamp", Instant.now());
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(
-                Map.of(
-                    "success", false,
-                    "data", null,
-                    "error", Map.of(
-                        "code", "AUTH-409",
-                        "message", e.getMessage()
-                    ),
-                    "timestamp", Instant.now()
-                )
-            );
+            Map<String, Object> error = new HashMap<>();
+            error.put("code", "AUTH-409");
+            error.put("message", e.getMessage());
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("data", null);
+            response.put("error", error);
+            response.put("timestamp", Instant.now());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         }
     }
 
@@ -50,38 +47,35 @@ public class AuthController {
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest req) {
         try {
             var data = authService.login(req);
-            return ResponseEntity.ok(
-                Map.of(
-                    "success", true,
-                    "data", data,
-                    "error", null,
-                    "timestamp", Instant.now()
-                )
-            );
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("data", data);
+            response.put("error", null);
+            response.put("timestamp", Instant.now());
+            return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                Map.of(
-                    "success", false,
-                    "data", null,
-                    "error", Map.of(
-                        "code", "AUTH-001",
-                        "message", e.getMessage()
-                    ),
-                    "timestamp", Instant.now()
-                )
-            );
+            Map<String, Object> error = new HashMap<>();
+            error.put("code", "AUTH-001");
+            error.put("message", e.getMessage());
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("data", null);
+            response.put("error", error);
+            response.put("timestamp", Instant.now());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
     }
 
     @GetMapping("/health")
     public ResponseEntity<?> health() {
-        return ResponseEntity.ok(
-            Map.of(
-                "success", true,
-                "data", Map.of("status", "healthy", "service", "LaundryLink Auth"),
-                "error", null,
-                "timestamp", Instant.now()
-            )
-        );
+        Map<String, Object> data = new HashMap<>();
+        data.put("status", "healthy");
+        data.put("service", "LaundryLink Auth");
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("data", data);
+        response.put("error", null);
+        response.put("timestamp", Instant.now());
+        return ResponseEntity.ok(response);
     }
 }
