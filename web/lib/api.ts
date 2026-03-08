@@ -1,0 +1,78 @@
+/**
+ * API Client Configuration
+ * Base URL and standard fetch wrapper for LaundryLink backend
+ */
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+
+export interface ApiResponse<T> {
+  success: boolean;
+  data: T | null;
+  error: {
+    code: string;
+    message: string;
+  } | null;
+  timestamp: string;
+}
+
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public code: string,
+    public status: number
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
+/**
+ * Generic fetch wrapper with standard error handling
+ */
+export async function apiRequest<T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<T> {
+  const url = `${API_BASE_URL}${endpoint}`;
+
+  const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options.headers as Record<string, string>),
+  };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers,
+    });
+
+    const data: ApiResponse<T> = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new ApiError(
+        data.error?.message || 'Request failed',
+        data.error?.code || 'UNKNOWN_ERROR',
+        response.status
+      );
+    }
+
+    return data.data as T;
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new ApiError(
+      error instanceof Error ? error.message : 'Network error',
+      'NETWORK_ERROR',
+      0
+    );
+  }
+}
+
+export default apiRequest;

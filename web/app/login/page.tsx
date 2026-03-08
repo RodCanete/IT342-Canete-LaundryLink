@@ -1,16 +1,65 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
+import { useState, FormEvent } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { WashingMachine, Eye, EyeOff } from "lucide-react"
+import { WashingMachine, Eye, EyeOff, AlertCircle } from "lucide-react"
+import { login } from "@/lib/auth"
+import { ApiError } from "@/lib/api"
+import { useToast } from "@/hooks/use-toast"
 
 export default function LoginPage() {
+  const router = useRouter()
+  const { toast } = useToast()
   const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  })
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setError(null)
+    setIsLoading(true)
+
+    try {
+      await login({
+        email: formData.email,
+        password: formData.password
+      })
+
+      toast({
+        title: "Welcome back!",
+        description: "Successfully logged in. Redirecting...",
+      })
+
+      // Redirect to shops page after successful login
+      setTimeout(() => {
+        router.push('/shops')
+      }, 1000)
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.message)
+      } else {
+        setError("An unexpected error occurred. Please try again.")
+      }
+      toast({
+        title: "Login failed",
+        description: err instanceof ApiError ? err.message : "Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 py-12">
@@ -55,7 +104,14 @@ export default function LoginPage() {
             <Separator className="flex-1" />
           </div>
 
-          <form className="flex flex-col gap-4">
+          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+            {error && (
+              <div className="flex items-center gap-2 rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+                <AlertCircle className="h-4 w-4" />
+                <span>{error}</span>
+              </div>
+            )}
+            
             <div className="flex flex-col gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -63,6 +119,9 @@ export default function LoginPage() {
                 type="email"
                 placeholder="you@example.com"
                 required
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                disabled={isLoading}
               />
             </div>
 
@@ -79,11 +138,15 @@ export default function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
                   required
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  disabled={isLoading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  disabled={isLoading}
                 >
                   {showPassword ? (
                     <EyeOff className="h-4 w-4" />
@@ -95,8 +158,8 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <Button type="submit" className="mt-2 w-full">
-              Log In
+            <Button type="submit" className="mt-2 w-full" disabled={isLoading}>
+              {isLoading ? "Logging in..." : "Log In"}
             </Button>
           </form>
 
