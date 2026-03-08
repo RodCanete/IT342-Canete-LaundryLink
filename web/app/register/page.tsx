@@ -57,12 +57,12 @@ export default function RegisterPage() {
 
       toast({
         title: "Account created!",
-        description: "Welcome to LaundryLink. Redirecting...",
+        description: "Please log in to continue.",
       })
 
-      // Redirect to shops page after successful registration
+      // Redirect to login page after successful registration
       setTimeout(() => {
-        router.push('/shops')
+        router.push('/login')
       }, 1000)
     } catch (err) {
       if (err instanceof ApiError) {
