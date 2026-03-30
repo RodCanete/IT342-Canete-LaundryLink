@@ -1,0 +1,107 @@
+package edu.cit.canete.laundrylink.ui.fragment
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.Snackbar
+import edu.cit.canete.laundrylink.R
+import edu.cit.canete.laundrylink.databinding.FragmentRegisterBinding
+import edu.cit.canete.laundrylink.viewmodel.AuthState
+import edu.cit.canete.laundrylink.viewmodel.AuthViewModel
+import kotlinx.coroutines.launch
+
+class RegisterFragment : Fragment() {
+
+    private var _binding: FragmentRegisterBinding? = null
+    private val binding get() = _binding!!
+    private val viewModel: AuthViewModel by viewModels()
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentRegisterBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.authState.collect { state ->
+                when (state) {
+                    is AuthState.Loading -> {
+                        binding.btnRegister.isEnabled = false
+                        binding.progressBar.visibility = View.VISIBLE
+                        binding.tvError.visibility = View.GONE
+                    }
+                    is AuthState.Success -> {
+                        binding.progressBar.visibility = View.GONE
+                        Snackbar.make(
+                            binding.root,
+                            "Account created successfully! Please log in.",
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                        viewModel.resetState()
+                        findNavController().navigate(R.id.action_register_to_login)
+                    }
+                    is AuthState.Error -> {
+                        binding.btnRegister.isEnabled = true
+                        binding.progressBar.visibility = View.GONE
+                        binding.tvError.text = state.message
+                        binding.tvError.visibility = View.VISIBLE
+                    }
+                    is AuthState.Idle -> {
+                        binding.btnRegister.isEnabled = true
+                        binding.progressBar.visibility = View.GONE
+                    }
+                }
+            }
+        }
+
+        binding.btnRegister.setOnClickListener {
+            val firstName = binding.etFirstName.text.toString().trim()
+            val lastName = binding.etLastName.text.toString().trim()
+            val email = binding.etEmail.text.toString().trim()
+            val password = binding.etPassword.text.toString()
+            val confirmPass = binding.etConfirmPassword.text.toString()
+
+            binding.tvError.visibility = View.GONE
+
+            when {
+                firstName.isBlank() || lastName.isBlank() -> {
+                    binding.tvError.text = "First name and last name are required"
+                    binding.tvError.visibility = View.VISIBLE
+                }
+                email.isBlank() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> {
+                    binding.tvError.text = "Enter a valid email address"
+                    binding.tvError.visibility = View.VISIBLE
+                }
+                password.length < 8 -> {
+                    binding.tvError.text = "Password must be at least 8 characters"
+                    binding.tvError.visibility = View.VISIBLE
+                }
+                password != confirmPass -> {
+                    binding.tvError.text = "Passwords do not match"
+                    binding.tvError.visibility = View.VISIBLE
+                }
+                else -> viewModel.register(firstName, lastName, email, password)
+            }
+        }
+
+        binding.btnGoToLogin.setOnClickListener {
+            findNavController().navigate(R.id.action_register_to_login)
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+}

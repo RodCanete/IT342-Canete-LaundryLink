@@ -1,21 +1,16 @@
 package edu.cit.canete.laundrylink
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import edu.cit.canete.laundrylink.ui.navigation.AppNavigation
-import edu.cit.canete.laundrylink.ui.theme.LaundryLinkTheme
+import androidx.appcompat.app.AppCompatActivity
+import edu.cit.canete.laundrylink.databinding.ActivityMainBinding
 
+class MainActivity : AppCompatActivity() {
 
-class MainActivity : ComponentActivity() {
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            LaundryLinkTheme {
-                AppNavigation()
-            }
-        }
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
     }
 }
