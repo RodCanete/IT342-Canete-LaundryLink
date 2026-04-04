@@ -30,6 +30,17 @@ export interface LoginData {
   password: string;
 }
 
+export interface GoogleLoginData {
+  idToken: string;
+}
+
+function storeAuthSession(response: AuthResponse): void {
+  if (response.accessToken) {
+    localStorage.setItem('accessToken', response.accessToken);
+    localStorage.setItem('user', JSON.stringify(response.user));
+  }
+}
+
 /**
  * Register a new user
  */
@@ -39,11 +50,7 @@ export async function register(data: RegisterData): Promise<AuthResponse> {
     body: JSON.stringify(data),
   });
 
-  // Store token in localStorage
-  if (response.accessToken) {
-    localStorage.setItem('accessToken', response.accessToken);
-    localStorage.setItem('user', JSON.stringify(response.user));
-  }
+  storeAuthSession(response);
 
   return response;
 }
@@ -57,11 +64,21 @@ export async function login(data: LoginData): Promise<AuthResponse> {
     body: JSON.stringify(data),
   });
 
-  // Store token in localStorage
-  if (response.accessToken) {
-    localStorage.setItem('accessToken', response.accessToken);
-    localStorage.setItem('user', JSON.stringify(response.user));
-  }
+  storeAuthSession(response);
+
+  return response;
+}
+
+/**
+ * Login with Google ID token
+ */
+export async function loginWithGoogle(data: GoogleLoginData): Promise<AuthResponse> {
+  const response = await apiRequest<AuthResponse>('/auth/google', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+
+  storeAuthSession(response);
 
   return response;
 }
