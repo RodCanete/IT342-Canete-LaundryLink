@@ -66,6 +66,39 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/google")
+    public ResponseEntity<?> googleLogin(@Valid @RequestBody GoogleOAuthRequest req) {
+        try {
+            var data = authService.googleLogin(req);
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("data", data);
+            response.put("error", null);
+            response.put("timestamp", Instant.now());
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("code", "AUTH-400");
+            error.put("message", e.getMessage());
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("data", null);
+            response.put("error", error);
+            response.put("timestamp", Instant.now());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (RuntimeException e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("code", "AUTH-002");
+            error.put("message", e.getMessage());
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("data", null);
+            response.put("error", error);
+            response.put("timestamp", Instant.now());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+    }
+
     @GetMapping("/health")
     public ResponseEntity<?> health() {
         Map<String, Object> data = new HashMap<>();

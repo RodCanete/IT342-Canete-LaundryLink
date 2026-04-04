@@ -9,7 +9,12 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users")
+@Table(
+    name = "users",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"oauth_provider", "oauth_id"})
+    }
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
