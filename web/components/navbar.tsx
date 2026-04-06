@@ -20,6 +20,21 @@ const navLinks = [
   { label: "How It Works", href: "/#how-it-works" },
 ]
 
+const customerLinks = [
+  { label: "Dashboard", href: "/customer/dashboard" },
+  { label: "My Bookings", href: "/bookings" },
+]
+
+const shopOwnerLinks = [
+  { label: "Dashboard", href: "/shop-owner/dashboard" },
+  { label: "Find Shops", href: "/shops" },
+]
+
+const adminLinks = [
+  { label: "Dashboard", href: "/admin" },
+  { label: "Slot Management", href: "/admin/slots" },
+]
+
 export function Navbar() {
   const [open, setOpen] = useState(false)
   const [user, setUser] = useState<AuthUser | null>(null)
@@ -37,6 +52,16 @@ export function Navbar() {
         ? "Admin Dashboard"
         : "Customer Dashboard"
     : "My Dashboard"
+
+  const navigationLinks = user
+    ? user.role === "CUSTOMER"
+      ? customerLinks
+      : user.role === "SHOP_OWNER"
+        ? shopOwnerLinks
+        : user.role === "ADMIN"
+          ? adminLinks
+          : navLinks
+    : navLinks
 
   const handleLogout = () => {
     logout()
@@ -58,7 +83,7 @@ export function Navbar() {
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
-          {navLinks.map((link) => (
+          {navigationLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -67,14 +92,6 @@ export function Navbar() {
               {link.label}
             </Link>
           ))}
-          {user && (
-            <Link
-              href={dashboardHref}
-              className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-            >
-              {dashboardLabel}
-            </Link>
-          )}
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
@@ -128,7 +145,7 @@ export function Navbar() {
                 <span className="text-lg font-bold text-foreground">LaundryLink</span>
               </Link>
               <nav className="flex flex-col gap-1">
-                {navLinks.map((link) => (
+                {navigationLinks.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
@@ -138,15 +155,6 @@ export function Navbar() {
                     {link.label}
                   </Link>
                 ))}
-                {user && (
-                  <Link
-                    href={dashboardHref}
-                    onClick={() => setOpen(false)}
-                    className="rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-                  >
-                    {dashboardLabel}
-                  </Link>
-                )}
               </nav>
               <div className="flex flex-col gap-2 border-t border-border pt-4">
                 {user ? (

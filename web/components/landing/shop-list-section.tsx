@@ -3,53 +3,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import Link from "next/link"
-
-const shops = [
-  {
-    id: 1,
-    name: "FreshSpin Laundry Hub",
-    address: "123 Osmeña Blvd, Cebu City",
-    hours: "7:00 AM - 9:00 PM",
-    rating: 4.8,
-    standardPrice: 120,
-    priorityPrice: 200,
-    prioritySlotsLeft: 3,
-    image: "/images/shop-1.jpg",
-  },
-  {
-    id: 2,
-    name: "CleanWave Express",
-    address: "45 Mango Ave, Cebu City",
-    hours: "6:00 AM - 10:00 PM",
-    rating: 4.6,
-    standardPrice: 100,
-    priorityPrice: 180,
-    prioritySlotsLeft: 5,
-    image: "/images/shop-2.jpg",
-  },
-  {
-    id: 3,
-    name: "Sparkle & Fold",
-    address: "78 Colon St, Cebu City",
-    hours: "8:00 AM - 8:00 PM",
-    rating: 4.9,
-    standardPrice: 130,
-    priorityPrice: 220,
-    prioritySlotsLeft: 1,
-    image: "/images/shop-3.jpg",
-  },
-  {
-    id: 4,
-    name: "QuickDry Laundromat",
-    address: "200 Gorordo Ave, Cebu City",
-    hours: "6:00 AM - 11:00 PM",
-    rating: 4.5,
-    standardPrice: 110,
-    priorityPrice: 190,
-    prioritySlotsLeft: 4,
-    image: "/images/shop-4.jpg",
-  },
-]
+import { partnerShops } from "@/lib/partner-shops"
 
 export function ShopListSection() {
   return (
@@ -78,8 +32,12 @@ export function ShopListSection() {
           </div>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {shops.map((shop) => (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          {partnerShops.map((shop) => {
+            const standardService = shop.services.find((service) => service.type === "STANDARD") ?? shop.services[0]
+            const priorityService = shop.services.find((service) => service.type === "PRIORITY") ?? shop.services[0]
+
+            return (
             <Card key={shop.id} className="group overflow-hidden border-border transition-shadow hover:shadow-lg">
               <div className="relative h-40 bg-secondary">
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -87,11 +45,11 @@ export function ShopListSection() {
                     <MapPin className="h-8 w-8 text-primary/60" />
                   </div>
                 </div>
-                {shop.prioritySlotsLeft <= 2 && (
+                {(priorityService.slotsRemaining ?? 0) <= 2 && (
                   <Badge className="absolute right-3 top-3 bg-destructive text-destructive-foreground">
-                    {shop.prioritySlotsLeft === 1
+                    {(priorityService.slotsRemaining ?? 0) === 1
                       ? "1 Priority Slot Left"
-                      : `${shop.prioritySlotsLeft} Slots Left`}
+                      : `${priorityService.slotsRemaining ?? 0} Slots Left`}
                   </Badge>
                 )}
               </div>
@@ -120,12 +78,12 @@ export function ShopListSection() {
                 <div className="flex items-center gap-2 rounded-lg bg-secondary/60 p-2.5 text-xs">
                   <div className="flex-1 text-center">
                     <span className="block text-muted-foreground">Standard</span>
-                    <span className="font-semibold text-foreground">{'PHP '}{shop.standardPrice}</span>
+                    <span className="font-semibold text-foreground">{'PHP '}{standardService.price}</span>
                   </div>
                   <div className="h-6 w-px bg-border" />
                   <div className="flex-1 text-center">
                     <span className="block text-primary font-medium">Priority</span>
-                    <span className="font-semibold text-foreground">{'PHP '}{shop.priorityPrice}</span>
+                    <span className="font-semibold text-foreground">{'PHP '}{priorityService.price}</span>
                   </div>
                 </div>
 
@@ -134,7 +92,8 @@ export function ShopListSection() {
                 </Button>
               </CardContent>
             </Card>
-          ))}
+            )
+          })}
         </div>
       </div>
     </section>
