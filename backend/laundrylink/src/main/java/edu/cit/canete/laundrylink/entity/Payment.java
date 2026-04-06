@@ -37,6 +37,9 @@ public class Payment {
     @Column(name = "payment_intent_id", unique = true)
     private String paymentIntentId;
 
+    @Column(name = "checkout_session_id", unique = true)
+    private String checkoutSessionId;
+
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 

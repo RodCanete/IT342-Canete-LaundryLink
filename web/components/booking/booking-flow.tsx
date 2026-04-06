@@ -12,6 +12,7 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 import { ApiError } from "@/lib/api"
 import {
   createBooking,
+  createPaymentIntent,
   formatBackendTime,
   getShop,
   getSlots,
@@ -255,7 +256,32 @@ export function BookingFlow({ shopId, preferredServiceId }: BookingFlowProps) {
         timeSlot: activeTime,
       })
 
-      router.push(`/bookings/confirmation?bookingId=${encodeURIComponent(booking.id)}`)
+      try {
+        const paymentIntent = await createPaymentIntent({
+          bookingId: booking.id,
+        })
+
+        if (!paymentIntent.checkoutUrl) {
+          throw new Error("Checkout URL was not returned by payment provider")
+        }
+
+        let checkoutHost: string
+        try {
+          checkoutHost = new URL(paymentIntent.checkoutUrl).hostname.toLowerCase()
+        } catch {
+          throw new Error("Invalid checkout URL returned by payment provider")
+        }
+        if (!checkoutHost.endsWith("paymongo.com")) {
+          throw new Error("Unexpected checkout host returned by payment provider")
+        }
+
+        window.location.assign(paymentIntent.checkoutUrl)
+      } catch (paymentError) {
+        console.error("Failed to initialize payment", paymentError)
+        router.push(
+          `/bookings/confirmation?bookingId=${encodeURIComponent(booking.id)}&paymentInitFailed=1`
+        )
+      }
     } catch (error) {
       setErrorMessage(
         error instanceof ApiError
@@ -264,7 +290,6 @@ export function BookingFlow({ shopId, preferredServiceId }: BookingFlowProps) {
           ? error.message
           : "Failed to create booking"
       )
-    } finally {
       setIsSubmitting(false)
     }
   }
