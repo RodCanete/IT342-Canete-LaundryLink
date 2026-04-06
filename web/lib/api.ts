@@ -52,12 +52,25 @@ export async function apiRequest<T>(
       headers,
     });
 
-    const data: ApiResponse<T> = await response.json();
+    const data = (await response.json()) as ApiResponse<T> & {
+      message?: string;
+      error?: { code?: string; message?: string } | string | null;
+    };
+
+    const extractedMessage =
+      (typeof data.error === 'object' && data.error?.message) ||
+      (typeof data.error === 'string' ? data.error : undefined) ||
+      data.message ||
+      'Request failed';
+
+    const extractedCode =
+      (typeof data.error === 'object' && data.error?.code) ||
+      'UNKNOWN_ERROR';
 
     if (!response.ok || !data.success) {
       throw new ApiError(
-        data.error?.message || 'Request failed',
-        data.error?.code || 'UNKNOWN_ERROR',
+        `${extractedMessage} (${(options.method || 'GET').toUpperCase()} ${endpoint})`,
+        extractedCode,
         response.status
       );
     }

@@ -11,4 +11,6 @@ import java.util.UUID;
 @Repository
 public interface SlotConfigRepository extends JpaRepository<SlotConfig, UUID> {
     List<SlotConfig> findByShop_IdAndService_IdAndConfigDate(UUID shopId, UUID serviceId, LocalDate configDate);
+
+    List<SlotConfig> findByConfigDate(LocalDate configDate);
 }

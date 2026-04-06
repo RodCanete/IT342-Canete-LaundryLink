@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from "react"
 import { useRouter } from "next/navigation"
-import { getCurrentUser, getDashboardPath, type AuthRole } from "@/lib/auth"
+import { getCurrentUser, getDashboardPath, isAuthenticated, type AuthRole } from "@/lib/auth"
 
 type DashboardGuardProps = {
   allowedRole: AuthRole
@@ -14,6 +14,11 @@ export function DashboardGuard({ allowedRole, children }: DashboardGuardProps) {
   const [resolved, setResolved] = useState(false)
 
   useEffect(() => {
+    if (!isAuthenticated()) {
+      router.replace("/login")
+      return
+    }
+
     const user = getCurrentUser()
 
     if (!user) {
