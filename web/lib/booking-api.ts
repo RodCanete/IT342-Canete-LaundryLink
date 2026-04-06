@@ -85,6 +85,34 @@ export type CreateBookingPayload = {
   timeSlot: string
 }
 
+export type CreatePaymentIntentPayload = {
+  bookingId: string
+}
+
+export type PaymentStatusApi = "PENDING" | "SUCCEEDED" | "FAILED" | "REFUNDED"
+
+export type PaymentIntentApi = {
+  paymentIntentId: string
+  checkoutSessionId: string | null
+  bookingId: string
+  amount: number
+  currency: string
+  status: PaymentStatusApi
+  checkoutUrl: string
+}
+
+export type PaymentApi = {
+  paymentIntentId: string
+  checkoutSessionId: string | null
+  bookingId: string
+  bookingStatus: BookingStatusApi
+  amount: number
+  currency: string
+  status: PaymentStatusApi
+  paidAt: string | null
+  eventType?: string
+}
+
 export async function listShops(): Promise<ShopApi[]> {
   return apiRequest<ShopApi[]>("/shops")
 }
@@ -143,6 +171,19 @@ export async function createBooking(payload: CreateBookingPayload): Promise<Book
     method: "POST",
     body: JSON.stringify(payload),
   })
+}
+
+export async function createPaymentIntent(payload: CreatePaymentIntentPayload): Promise<PaymentIntentApi> {
+  assertUuid(payload.bookingId, "bookingId")
+  return apiRequest<PaymentIntentApi>("/payments/create-intent", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  })
+}
+
+export async function getPaymentByBooking(bookingId: string): Promise<PaymentApi> {
+  assertUuid(bookingId, "bookingId")
+  return apiRequest<PaymentApi>(`/payments/booking/${bookingId}`)
 }
 
 export function toIsoDateOnly(date: Date): string {

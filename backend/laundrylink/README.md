@@ -20,6 +20,11 @@
    DATABASE_USERNAME=postgres
    DATABASE_PASSWORD=YOUR_ACTUAL_PASSWORD
    JWT_SECRET=YourUniqueSecretKey32CharactersMinimum
+   PAYMONGO_SECRET_KEY=sk_test_xxx
+   PAYMONGO_REQUIRE_TEST_KEY=true
+   PAYMONGO_WEBHOOK_SECRET=whsec_xxx
+   PAYMONGO_SUCCESS_URL=http://localhost:3000/bookings/confirmation?bookingId={bookingId}&payment=success
+   PAYMONGO_CANCEL_URL=http://localhost:3000/bookings/confirmation?bookingId={bookingId}&payment=cancel
    ```
 
 ### Step 2: Create Database Tables
