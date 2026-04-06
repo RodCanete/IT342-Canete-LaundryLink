@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { WashingMachine, Eye, EyeOff, AlertCircle } from "lucide-react"
 import { GoogleLogin, type CredentialResponse } from "@react-oauth/google"
-import { login, loginWithGoogle } from "@/lib/auth"
+import { getDashboardPath, login, loginWithGoogle } from "@/lib/auth"
 import { ApiError } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
 
@@ -33,7 +33,7 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      await login({
+      const response = await login({
         email: formData.email,
         password: formData.password
       })
@@ -43,9 +43,9 @@ export default function LoginPage() {
         description: "Successfully logged in. Redirecting...",
       })
 
-      // Redirect to shops page after successful login
+      const redirectPath = getDashboardPath(response.user.role)
       setTimeout(() => {
-        router.push('/shops')
+        router.push(redirectPath)
       }, 1000)
     } catch (err) {
       if (err instanceof ApiError) {
@@ -75,15 +75,16 @@ export default function LoginPage() {
     setIsGoogleLoading(true)
 
     try {
-      await loginWithGoogle({ idToken })
+      const response = await loginWithGoogle({ idToken })
 
       toast({
         title: "Welcome back!",
         description: "Successfully logged in with Google. Redirecting...",
       })
 
+      const redirectPath = getDashboardPath(response.user.role)
       setTimeout(() => {
-        router.push('/shops')
+        router.push(redirectPath)
       }, 1000)
     } catch (err) {
       if (err instanceof ApiError) {

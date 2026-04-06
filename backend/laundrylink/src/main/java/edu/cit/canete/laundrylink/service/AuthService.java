@@ -2,6 +2,7 @@ package edu.cit.canete.laundrylink.service;
 
 import edu.cit.canete.laundrylink.dto.*;
 import edu.cit.canete.laundrylink.entity.User;
+import edu.cit.canete.laundrylink.entity.UserRole;
 import edu.cit.canete.laundrylink.repository.UserRepository;
 import edu.cit.canete.laundrylink.security.GoogleTokenVerifier;
 import edu.cit.canete.laundrylink.security.JwtUtil;
@@ -33,12 +34,16 @@ public class AuthService {
             throw new RuntimeException("Email already registered");
         }
 
+        if (!UserRole.isSelfServiceRole(req.getRole())) {
+            throw new RuntimeException("Admin accounts cannot be created through registration");
+        }
+
         User user = new User();
         user.setFirstName(req.getFirstName());
         user.setLastName(req.getLastName());
         user.setEmail(req.getEmail());
         user.setPasswordHash(encoder.encode(req.getPassword()));
-        user.setRole("CUSTOMER");
+        user.setRole(UserRole.normalizeForRegistration(req.getRole()));
         userRepository.save(user);
 
         return buildAuthResponse(user);
@@ -91,7 +96,7 @@ public class AuthService {
         user.setEmail(email);
         user.setOauthProvider("GOOGLE");
         user.setOauthId(oauthId);
-        user.setRole("CUSTOMER");
+        user.setRole(UserRole.CUSTOMER.name());
 
         String fullName = payload.get("name") != null ? payload.get("name").toString() : null;
         String givenName = payload.get("given_name") != null ? payload.get("given_name").toString() : null;

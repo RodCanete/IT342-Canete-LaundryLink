@@ -8,9 +8,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { WashingMachine, Eye, EyeOff, AlertCircle } from "lucide-react"
+import { WashingMachine, Eye, EyeOff, AlertCircle, Check } from "lucide-react"
 import { GoogleLogin, type CredentialResponse } from "@react-oauth/google"
-import { register, loginWithGoogle } from "@/lib/auth"
+import { getDashboardPath, register, loginWithGoogle } from "@/lib/auth"
 import { ApiError } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
 
@@ -28,7 +28,8 @@ export default function RegisterPage() {
     lastName: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    role: 'CUSTOMER' as 'CUSTOMER' | 'SHOP_OWNER'
   })
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -50,11 +51,12 @@ export default function RegisterPage() {
     setIsLoading(true)
 
     try {
-      await register({
+      const response = await register({
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
-        password: formData.password
+        password: formData.password,
+        role: formData.role
       })
 
       toast({
@@ -62,9 +64,9 @@ export default function RegisterPage() {
         description: "Please log in to continue.",
       })
 
-      // Redirect to login page after successful registration
+      const redirectPath = getDashboardPath(response.user.role)
       setTimeout(() => {
-        router.push('/login')
+        router.push(redirectPath)
       }, 1000)
     } catch (err) {
       if (err instanceof ApiError) {
@@ -94,15 +96,16 @@ export default function RegisterPage() {
     setIsGoogleLoading(true)
 
     try {
-      await loginWithGoogle({ idToken })
+      const response = await loginWithGoogle({ idToken })
 
       toast({
         title: "Account ready!",
         description: "Successfully signed in with Google. Redirecting...",
       })
 
+      const redirectPath = getDashboardPath(response.user.role)
       setTimeout(() => {
-        router.push('/shops')
+        router.push(redirectPath)
       }, 1000)
     } catch (err) {
       if (err instanceof ApiError) {
@@ -170,6 +173,40 @@ export default function RegisterPage() {
                 <span>{error}</span>
               </div>
             )}
+
+            <div className="flex flex-col gap-2">
+              <Label>Account Type</Label>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, role: 'CUSTOMER' })}
+                  className={`rounded-lg border p-4 text-left transition ${formData.role === 'CUSTOMER' ? 'border-primary bg-primary/10' : 'border-border bg-background hover:border-primary/60'}`}
+                  disabled={isLoading}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="font-medium text-foreground">Customer</p>
+                      <p className="text-xs text-muted-foreground">Book slots and manage your orders</p>
+                    </div>
+                    {formData.role === 'CUSTOMER' && <Check className="h-4 w-4 text-primary" />}
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, role: 'SHOP_OWNER' })}
+                  className={`rounded-lg border p-4 text-left transition ${formData.role === 'SHOP_OWNER' ? 'border-primary bg-primary/10' : 'border-border bg-background hover:border-primary/60'}`}
+                  disabled={isLoading}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="font-medium text-foreground">Laundry Shop Owner</p>
+                      <p className="text-xs text-muted-foreground">Manage a shop and its bookings</p>
+                    </div>
+                    {formData.role === 'SHOP_OWNER' && <Check className="h-4 w-4 text-primary" />}
+                  </div>
+                </button>
+              </div>
+            </div>
             
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="flex flex-col gap-2">

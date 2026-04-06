@@ -1,7 +1,8 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Link from "next/link"
-import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import {
@@ -12,15 +13,37 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Menu, User, WashingMachine, ChevronDown } from "lucide-react"
+import { getCurrentUser, getDashboardPath, logout, type User as AuthUser } from "@/lib/auth"
 
 const navLinks = [
   { label: "Find Shops", href: "/shops" },
-  { label: "My Bookings", href: "/bookings" },
   { label: "How It Works", href: "/#how-it-works" },
 ]
 
 export function Navbar() {
   const [open, setOpen] = useState(false)
+  const [user, setUser] = useState<AuthUser | null>(null)
+  const router = useRouter()
+
+  useEffect(() => {
+    setUser(getCurrentUser())
+  }, [])
+
+  const dashboardHref = user ? getDashboardPath(user.role) : "/login"
+  const dashboardLabel = user
+    ? user.role === "SHOP_OWNER"
+      ? "Shop Owner Dashboard"
+      : user.role === "ADMIN"
+        ? "Admin Dashboard"
+        : "Customer Dashboard"
+    : "My Dashboard"
+
+  const handleLogout = () => {
+    logout()
+    setUser(null)
+    setOpen(false)
+    router.push("/")
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-lg">
@@ -44,6 +67,14 @@ export function Navbar() {
               {link.label}
             </Link>
           ))}
+          {user && (
+            <Link
+              href={dashboardHref}
+              className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            >
+              {dashboardLabel}
+            </Link>
+          )}
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
@@ -55,17 +86,25 @@ export function Navbar() {
                 <ChevronDown className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem asChild>
-                <Link href="/login">Log In</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/register">Create Account</Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href="/bookings">My Bookings</Link>
-              </DropdownMenuItem>
+            <DropdownMenuContent align="end" className="w-56">
+              {user ? (
+                <>
+                  <DropdownMenuItem asChild>
+                    <Link href={dashboardHref}>{dashboardLabel}</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>Log Out</DropdownMenuItem>
+                </>
+              ) : (
+                <>
+                  <DropdownMenuItem asChild>
+                    <Link href="/login">Log In</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/register">Create Account</Link>
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
           <Button asChild size="sm">
@@ -99,14 +138,31 @@ export function Navbar() {
                     {link.label}
                   </Link>
                 ))}
+                {user && (
+                  <Link
+                    href={dashboardHref}
+                    onClick={() => setOpen(false)}
+                    className="rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                  >
+                    {dashboardLabel}
+                  </Link>
+                )}
               </nav>
               <div className="flex flex-col gap-2 border-t border-border pt-4">
-                <Button asChild variant="outline" size="sm" onClick={() => setOpen(false)}>
-                  <Link href="/login">Log In</Link>
-                </Button>
-                <Button asChild size="sm" onClick={() => setOpen(false)}>
-                  <Link href="/register">Create Account</Link>
-                </Button>
+                {user ? (
+                  <Button variant="outline" size="sm" onClick={handleLogout}>
+                    Log Out
+                  </Button>
+                ) : (
+                  <>
+                    <Button asChild variant="outline" size="sm" onClick={() => setOpen(false)}>
+                      <Link href="/login">Log In</Link>
+                    </Button>
+                    <Button asChild size="sm" onClick={() => setOpen(false)}>
+                      <Link href="/register">Create Account</Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </SheetContent>

@@ -84,9 +84,12 @@ Content-Type: application/json
   "firstName": "Juan",
   "lastName": "Dela Cruz",
   "email": "juan@example.com",
-  "password": "SecurePass123"
+  "password": "SecurePass123",
+  "role": "CUSTOMER"
 }
 ```
+
+Allowed registration roles are `CUSTOMER` and `SHOP_OWNER`. `ADMIN` is reserved and cannot be created through self-registration.
 
 ### Login
 ```http
@@ -122,7 +125,8 @@ curl -X POST http://localhost:8080/api/auth/register \
     "firstName": "Juan",
     "lastName": "Dela Cruz",
     "email": "juan@example.com",
-    "password": "SecurePass123"
+    "password": "SecurePass123",
+    "role": "SHOP_OWNER"
   }'
 ```
 

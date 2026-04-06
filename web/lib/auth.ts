@@ -10,8 +10,10 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
-  role: string;
+  role: AuthRole;
 }
+
+export type AuthRole = 'CUSTOMER' | 'SHOP_OWNER' | 'ADMIN';
 
 export interface AuthResponse {
   user: User;
@@ -23,6 +25,7 @@ export interface RegisterData {
   lastName: string;
   email: string;
   password: string;
+  role: 'CUSTOMER' | 'SHOP_OWNER';
 }
 
 export interface LoginData {
@@ -32,6 +35,18 @@ export interface LoginData {
 
 export interface GoogleLoginData {
   idToken: string;
+}
+
+export function getDashboardPath(role: AuthRole | string | null | undefined): string {
+  switch (role) {
+    case 'SHOP_OWNER':
+      return '/shop-owner/dashboard';
+    case 'ADMIN':
+      return '/admin';
+    case 'CUSTOMER':
+    default:
+      return '/customer/dashboard';
+  }
 }
 
 function storeAuthSession(response: AuthResponse): void {
