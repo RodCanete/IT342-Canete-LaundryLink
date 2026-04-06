@@ -1,11 +1,15 @@
+"use client"
+
 import Link from "next/link"
+import { useState } from "react"
 import { CalendarCheck2, Clock3, CreditCard, MapPinned } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
-import { MyBookingsView } from "@/components/booking/my-bookings-view"
+import { PartnerShopsMap } from "@/components/customer/partner-shops-map"
+import { partnerShops } from "@/lib/partner-shops"
 
 const metrics = [
   { label: "Upcoming Bookings", value: "3", icon: CalendarCheck2, tone: "text-primary" },
@@ -15,6 +19,9 @@ const metrics = [
 ]
 
 export function CustomerDashboard() {
+  const [activeShopId, setActiveShopId] = useState(partnerShops[0]?.id ?? 1)
+  const activeShop = partnerShops.find((shop) => shop.id === activeShopId) ?? partnerShops[0]
+
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
@@ -35,6 +42,9 @@ export function CustomerDashboard() {
             <div className="flex flex-wrap gap-3">
               <Button asChild>
                 <Link href="/shops">Book a Slot</Link>
+              </Button>
+              <Button asChild variant="secondary">
+                <Link href="/bookings">My Bookings</Link>
               </Button>
               <Button asChild variant="outline">
                 <Link href="/shops">Browse Shops</Link>
@@ -58,7 +68,7 @@ export function CustomerDashboard() {
             ))}
           </div>
 
-          <MyBookingsView />
+          <PartnerShopsMap activeShop={activeShop} onSelectShop={setActiveShopId} />
         </section>
       </main>
       <Footer />

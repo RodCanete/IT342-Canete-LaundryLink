@@ -6,48 +6,28 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { getPartnerShopById } from "@/lib/partner-shops"
 
-const shop = {
-  id: 1,
-  name: "FreshSpin Laundry Hub",
-  address: "123 Osmeña Blvd, Cebu City",
-  city: "Cebu City",
-  hours: "7:00 AM - 9:00 PM",
-  rating: 4.8,
-  reviewCount: 142,
-  description: "A modern self-service and full-service laundromat equipped with commercial-grade machines. We offer same-day turnaround for priority bookings.",
-  services: [
-    {
-      id: 1,
-      name: "Standard Wash & Fold",
-      type: "STANDARD" as const,
-      price: 120,
-      description: "Regular queue processing. Typically 4-6 hours turnaround during business hours.",
-      features: ["8kg load capacity", "Detergent included", "Fold & pack"],
-    },
-    {
-      id: 2,
-      name: "Priority Wash & Fold",
-      type: "PRIORITY" as const,
-      price: 200,
-      description: "Limited daily slots for faster turnaround. Processed within 2-3 hours of drop-off.",
-      features: ["8kg load capacity", "Detergent included", "Fold & pack", "2-3 hour turnaround", "SMS notification"],
-      slotsRemaining: 3,
-      maxSlots: 10,
-    },
-  ],
+type ShopDetailViewProps = {
+  shopId: number
 }
 
-export function ShopDetailView() {
+export function ShopDetailView({ shopId }: ShopDetailViewProps) {
+  const shop = getPartnerShopById(shopId) ?? getPartnerShopById(1)
+
+  if (!shop) {
+    return null
+  }
+
   return (
     <section className="bg-background py-8 lg:py-12">
       <div className="mx-auto max-w-4xl px-4 lg:px-8">
         <Link
-          href="/shops"
+          href="/customer/dashboard"
           className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Shops
+          Back to Dashboard
         </Link>
 
         <div className="mb-8">
@@ -70,7 +50,7 @@ export function ShopDetailView() {
             <div className="flex items-center gap-2 rounded-lg bg-secondary px-3 py-2">
               <Star className="h-4 w-4 fill-warning text-warning" />
               <span className="text-sm font-semibold text-foreground">{shop.rating}</span>
-              <span className="text-xs text-muted-foreground">({shop.reviewCount} reviews)</span>
+              <span className="text-xs text-muted-foreground">Nearby partner</span>
             </div>
           </div>
           <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
@@ -78,23 +58,14 @@ export function ShopDetailView() {
           </p>
         </div>
 
-        <div className="mb-6 rounded-xl border border-border bg-muted/40 p-4">
-          <div className="flex h-48 items-center justify-center rounded-lg border border-dashed border-border bg-background">
-            <div className="flex flex-col items-center gap-2 text-center">
-              <MapPin className="h-8 w-8 text-primary/40" />
-              <p className="text-sm text-muted-foreground">Shop location on Google Map</p>
-            </div>
-          </div>
-        </div>
-
         <Separator className="mb-8" />
 
         <div>
           <h2 className="mb-6 text-xl font-bold text-foreground">Available Services</h2>
           <div className="grid gap-6 sm:grid-cols-2">
-            {shop.services.map((service) => (
+            {shop.services.map((service, serviceIndex) => (
               <Card
-                key={service.id}
+                key={`${shop.id}-${service.type}-${service.name}-${serviceIndex}`}
                 className={`relative overflow-hidden border-border transition-all hover:shadow-md ${
                   service.type === "PRIORITY" ? "ring-2 ring-primary/20" : ""
                 }`}
@@ -118,8 +89,8 @@ export function ShopDetailView() {
                   </div>
 
                   <ul className="flex flex-col gap-1.5">
-                    {service.features.map((feature) => (
-                      <li key={feature} className="flex items-center gap-2 text-sm text-muted-foreground">
+                    {service.features.map((feature, featureIndex) => (
+                      <li key={`${service.name}-${feature}-${featureIndex}`} className="flex items-center gap-2 text-sm text-muted-foreground">
                         <div className="h-1.5 w-1.5 rounded-full bg-primary" />
                         {feature}
                       </li>
@@ -137,7 +108,7 @@ export function ShopDetailView() {
 
                   <Button asChild className="w-full">
                     <Link
-                      href={`/shops/${shop.id}/book?service=${service.id}&type=${service.type}`}
+                      href={`/shops/${shop.id}/book?service=${serviceIndex + 1}&type=${service.type}`}
                     >
                       {service.type === "PRIORITY" ? "Book Priority Slot" : "Book Standard"}
                     </Link>

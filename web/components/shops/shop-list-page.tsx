@@ -4,64 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-
-const shops = [
-  {
-    id: 1,
-    name: "FreshSpin Laundry Hub",
-    address: "123 Osmeña Blvd, Cebu City",
-    city: "Cebu City",
-    hours: "7:00 AM - 9:00 PM",
-    rating: 4.8,
-    standardPrice: 120,
-    priorityPrice: 200,
-    prioritySlotsLeft: 3,
-  },
-  {
-    id: 2,
-    name: "CleanWave Express",
-    address: "45 Mango Ave, Cebu City",
-    city: "Cebu City",
-    hours: "6:00 AM - 10:00 PM",
-    rating: 4.6,
-    standardPrice: 100,
-    priorityPrice: 180,
-    prioritySlotsLeft: 5,
-  },
-  {
-    id: 3,
-    name: "Sparkle & Fold",
-    address: "78 Colon St, Cebu City",
-    city: "Cebu City",
-    hours: "8:00 AM - 8:00 PM",
-    rating: 4.9,
-    standardPrice: 130,
-    priorityPrice: 220,
-    prioritySlotsLeft: 1,
-  },
-  {
-    id: 4,
-    name: "QuickDry Laundromat",
-    address: "200 Gorordo Ave, Cebu City",
-    city: "Cebu City",
-    hours: "6:00 AM - 11:00 PM",
-    rating: 4.5,
-    standardPrice: 110,
-    priorityPrice: 190,
-    prioritySlotsLeft: 4,
-  },
-  {
-    id: 5,
-    name: "BrightWash Laundry",
-    address: "15 Gen. Maxilom Ave, Cebu City",
-    city: "Cebu City",
-    hours: "7:00 AM - 10:00 PM",
-    rating: 4.7,
-    standardPrice: 115,
-    priorityPrice: 195,
-    prioritySlotsLeft: 2,
-  },
-]
+import { partnerShops } from "@/lib/partner-shops"
 
 export function ShopListPage() {
   return (
@@ -103,7 +46,11 @@ export function ShopListPage() {
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {shops.map((shop) => (
+          {partnerShops.map((shop) => {
+            const standardService = shop.services.find((service) => service.type === "STANDARD") ?? shop.services[0]
+            const priorityService = shop.services.find((service) => service.type === "PRIORITY") ?? shop.services[0]
+
+            return (
             <Card key={shop.id} className="group border-border transition-all hover:shadow-lg hover:border-primary/20">
               <CardContent className="flex flex-col gap-4 p-5">
                 <div className="flex items-start justify-between">
@@ -130,23 +77,23 @@ export function ShopListPage() {
                 <div className="flex items-center gap-3 rounded-lg bg-secondary/60 p-3">
                   <div className="flex-1 text-center">
                     <span className="block text-xs text-muted-foreground">Standard</span>
-                    <span className="text-sm font-semibold text-foreground">{'PHP '}{shop.standardPrice}</span>
+                    <span className="text-sm font-semibold text-foreground">{'PHP '}{standardService.price}</span>
                   </div>
                   <div className="h-8 w-px bg-border" />
                   <div className="flex-1 text-center">
                     <span className="block text-xs font-medium text-primary">Priority</span>
-                    <span className="text-sm font-semibold text-foreground">{'PHP '}{shop.priorityPrice}</span>
+                    <span className="text-sm font-semibold text-foreground">{'PHP '}{priorityService.price}</span>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  {shop.prioritySlotsLeft <= 3 ? (
+                  {(priorityService.slotsRemaining ?? 0) <= 3 ? (
                     <Badge variant="secondary" className="text-xs bg-destructive/10 text-destructive border-none">
-                      {shop.prioritySlotsLeft} priority {shop.prioritySlotsLeft === 1 ? "slot" : "slots"} left today
+                      {priorityService.slotsRemaining ?? 0} priority {(priorityService.slotsRemaining ?? 0) === 1 ? "slot" : "slots"} left today
                     </Badge>
                   ) : (
                     <Badge variant="secondary" className="text-xs bg-success/10 text-success border-none">
-                      {shop.prioritySlotsLeft} priority slots available
+                      {priorityService.slotsRemaining ?? 0} priority slots available
                     </Badge>
                   )}
                 </div>
@@ -156,7 +103,8 @@ export function ShopListPage() {
                 </Button>
               </CardContent>
             </Card>
-          ))}
+            )
+          })}
         </div>
       </div>
     </section>
