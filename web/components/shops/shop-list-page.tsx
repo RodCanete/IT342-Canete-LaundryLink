@@ -1,12 +1,89 @@
+"use client"
+
 import Link from "next/link"
+import { useEffect, useState } from "react"
 import { MapPin, Clock, Star, Search, Filter } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { partnerShops } from "@/lib/partner-shops"
+import { ApiError } from "@/lib/api"
+import { isUuid, listShopsSummary, toIsoDateOnly } from "@/lib/booking-api"
+
+type ShopListCard = {
+  id: string
+  name: string
+  address: string
+  hours: string
+  rating: number
+  standardPrice: number
+  priorityPrice: number
+  prioritySlots: number
+}
 
 export function ShopListPage() {
+  const [shops, setShops] = useState<ShopListCard[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  useEffect(() => {
+    let active = true
+
+    async function loadShopCards() {
+      setIsLoading(true)
+      setErrorMessage(null)
+
+      try {
+        const today = toIsoDateOnly(new Date())
+        const shopRows = await listShopsSummary(today)
+        const validShops = shopRows.filter((shop) => isUuid(shop.id))
+
+        const cards = await Promise.all(
+          validShops.map(async (shop) => {
+            return {
+              id: shop.id,
+              name: shop.name,
+              address: shop.address,
+              hours: shop.operatingHours || "Hours not set",
+              rating: 4.8,
+              standardPrice: shop.standardPrice ?? 0,
+              priorityPrice: shop.priorityPrice ?? 0,
+              prioritySlots: shop.prioritySlots ?? 0,
+            }
+          })
+        )
+
+        if (!active) {
+          return
+        }
+
+        setShops(cards)
+      } catch (error) {
+        if (!active) {
+          return
+        }
+
+        setErrorMessage(
+          error instanceof ApiError
+            ? error.message
+            : error instanceof Error
+            ? error.message
+            : "Failed to load partner shops"
+        )
+      } finally {
+        if (active) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    loadShopCards()
+
+    return () => {
+      active = false
+    }
+  }, [])
+
   return (
     <section className="bg-background py-8 lg:py-12">
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
@@ -45,10 +122,15 @@ export function ShopListPage() {
           </div>
         </div>
 
+        {isLoading ? (
+          <p className="text-sm text-muted-foreground">Loading available shops...</p>
+        ) : errorMessage ? (
+          <p className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+            {errorMessage}
+          </p>
+        ) : (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {partnerShops.map((shop) => {
-            const standardService = shop.services.find((service) => service.type === "STANDARD") ?? shop.services[0]
-            const priorityService = shop.services.find((service) => service.type === "PRIORITY") ?? shop.services[0]
+          {shops.map((shop) => {
 
             return (
             <Card key={shop.id} className="group border-border transition-all hover:shadow-lg hover:border-primary/20">
@@ -77,23 +159,23 @@ export function ShopListPage() {
                 <div className="flex items-center gap-3 rounded-lg bg-secondary/60 p-3">
                   <div className="flex-1 text-center">
                     <span className="block text-xs text-muted-foreground">Standard</span>
-                    <span className="text-sm font-semibold text-foreground">{'PHP '}{standardService.price}</span>
+                    <span className="text-sm font-semibold text-foreground">{'PHP '}{shop.standardPrice}</span>
                   </div>
                   <div className="h-8 w-px bg-border" />
                   <div className="flex-1 text-center">
                     <span className="block text-xs font-medium text-primary">Priority</span>
-                    <span className="text-sm font-semibold text-foreground">{'PHP '}{priorityService.price}</span>
+                    <span className="text-sm font-semibold text-foreground">{'PHP '}{shop.priorityPrice}</span>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  {(priorityService.slotsRemaining ?? 0) <= 3 ? (
+                  {shop.prioritySlots <= 3 ? (
                     <Badge variant="secondary" className="text-xs bg-destructive/10 text-destructive border-none">
-                      {priorityService.slotsRemaining ?? 0} priority {(priorityService.slotsRemaining ?? 0) === 1 ? "slot" : "slots"} left today
+                      {shop.prioritySlots} priority {shop.prioritySlots === 1 ? "slot" : "slots"} left today
                     </Badge>
                   ) : (
                     <Badge variant="secondary" className="text-xs bg-success/10 text-success border-none">
-                      {priorityService.slotsRemaining ?? 0} priority slots available
+                      {shop.prioritySlots} priority slots available
                     </Badge>
                   )}
                 </div>
@@ -106,6 +188,7 @@ export function ShopListPage() {
             )
           })}
         </div>
+        )}
       </div>
     </section>
   )

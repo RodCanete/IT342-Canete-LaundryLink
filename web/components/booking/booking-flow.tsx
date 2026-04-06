@@ -1,21 +1,26 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { ArrowLeft, ArrowRight, Calendar, Clock, Upload, FileText, CheckCircle2, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
-
-const timeSlots = [
-  "07:00 AM", "08:00 AM", "09:00 AM", "10:00 AM", "11:00 AM",
-  "12:00 PM", "01:00 PM", "02:00 PM", "03:00 PM", "04:00 PM",
-  "05:00 PM", "06:00 PM",
-]
-
-const unavailableSlots = ["09:00 AM", "02:00 PM", "05:00 PM"]
+import { ApiError } from "@/lib/api"
+import {
+  createBooking,
+  formatBackendTime,
+  getShop,
+  getSlots,
+  listShopServices,
+  toIsoDateOnly,
+  type ServiceApi,
+  type ShopApi,
+  type SlotApi,
+} from "@/lib/booking-api"
 
 const steps = [
   { label: "Date", icon: Calendar },
@@ -24,23 +29,271 @@ const steps = [
   { label: "Summary", icon: FileText },
 ]
 
-export function BookingFlow() {
+type BookingFlowProps = {
+  shopId: string
+  preferredServiceId?: string
+}
+
+export function BookingFlow({ shopId, preferredServiceId }: BookingFlowProps) {
+  const router = useRouter()
   const [currentStep, setCurrentStep] = useState(0)
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
   const [selectedTime, setSelectedTime] = useState<string | null>(null)
   const [uploadedFile, setUploadedFile] = useState<string | null>(null)
+  const [shop, setShop] = useState<ShopApi | null>(null)
+  const [services, setServices] = useState<ServiceApi[]>([])
+  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(preferredServiceId ?? null)
+  const [slots, setSlots] = useState<SlotApi[]>([])
+  const [isLoadingDetails, setIsLoadingDetails] = useState(true)
+  const [isLoadingSlots, setIsLoadingSlots] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [serviceNotice, setServiceNotice] = useState<string | null>(null)
+
+  useEffect(() => {
+    let active = true
+
+    async function loadBookingContext() {
+      setErrorMessage(null)
+      setIsLoadingDetails(true)
+
+      try {
+        const [shopData, servicesData] = await Promise.all([getShop(shopId), listShopServices(shopId)])
+
+        if (!active) {
+          return
+        }
+
+        setShop(shopData)
+        setServices(servicesData)
+        const initialService =
+          servicesData.find((service) => service.id === preferredServiceId) ??
+          servicesData.find((service) => service.serviceType === "PRIORITY") ??
+          servicesData[0] ??
+          null
+        setSelectedServiceId(initialService?.id ?? null)
+      } catch (error) {
+        if (!active) {
+          return
+        }
+
+        setErrorMessage(
+          error instanceof ApiError
+            ? error.message
+            : error instanceof Error
+            ? error.message
+            : "Failed to load booking details"
+        )
+      } finally {
+        if (active) {
+          setIsLoadingDetails(false)
+        }
+      }
+    }
+
+    loadBookingContext()
+
+    return () => {
+      active = false
+    }
+  }, [shopId])
+
+  const selectedService = useMemo(() => {
+    if (services.length === 0) {
+      return null
+    }
+
+    if (selectedServiceId) {
+      const selected = services.find((service) => service.id === selectedServiceId)
+      if (selected) {
+        return selected
+      }
+    }
+
+    return services.find((service) => service.serviceType === "PRIORITY") ?? services[0]
+  }, [selectedServiceId, services])
+
+  useEffect(() => {
+    setSelectedTime(null)
+    setServiceNotice(null)
+
+    if (!selectedService || !selectedDate) {
+      setSlots([])
+      return
+    }
+
+    const activeService = selectedService
+    const activeDate = selectedDate
+
+    let active = true
+
+    async function loadSlots() {
+      setIsLoadingSlots(true)
+      setErrorMessage(null)
+
+      try {
+        const slotRows = await getSlots({
+          shopId,
+          serviceId: activeService.id,
+          date: toIsoDateOnly(activeDate),
+        })
+
+        if (active) {
+          setSlots(slotRows)
+        }
+      } catch (error) {
+        if (!active) {
+          return
+        }
+
+        setErrorMessage(
+          error instanceof ApiError
+            ? error.message
+            : error instanceof Error
+            ? error.message
+            : "Failed to load available slots"
+        )
+        setSlots([])
+      } finally {
+        if (active) {
+          setIsLoadingSlots(false)
+        }
+      }
+    }
+
+    loadSlots()
+
+    return () => {
+      active = false
+    }
+  }, [selectedDate, selectedService, shopId])
+
+  useEffect(() => {
+    if (!selectedDate || !selectedService || isLoadingSlots) {
+      return
+    }
+
+    const activeService = selectedService
+    const availableForSelected = getAvailableCount(slots)
+    if (availableForSelected > 0) {
+      return
+    }
+
+    let active = true
+    const selectedDateText = toIsoDateOnly(selectedDate)
+
+    async function switchToServiceWithSlots() {
+      const candidates = services.filter(
+        (service) => service.id !== activeService.id && service.serviceType === activeService.serviceType
+      )
+
+      for (const candidate of candidates) {
+        try {
+          const candidateSlots = await getSlots({
+            shopId,
+            serviceId: candidate.id,
+            date: selectedDateText,
+          })
+
+          if (!active) {
+            return
+          }
+
+          if (getAvailableCount(candidateSlots) > 0) {
+            setSelectedServiceId(candidate.id)
+            setServiceNotice(
+              `No slots for ${activeService.name}. Switched to ${candidate.name}, which has available slots.`
+            )
+            return
+          }
+        } catch {
+          // Try next candidate if one service cannot be loaded.
+        }
+      }
+
+      if (active) {
+        setServiceNotice(`No slots are configured for ${activeService.name} on ${selectedDateText}.`)
+      }
+    }
+
+    switchToServiceWithSlots()
+
+    return () => {
+      active = false
+    }
+  }, [isLoadingSlots, selectedDate, selectedService, services, shopId, slots])
 
   const canProceed = () => {
-    if (currentStep === 0) return !!selectedDate
-    if (currentStep === 1) return !!selectedTime
+    if (currentStep === 0) {
+      return !!selectedDate
+    }
+
+    if (currentStep === 1) {
+      return !!selectedTime
+    }
+
     return true
+  }
+
+  async function handleSubmitBooking() {
+    const activeDate = selectedDate
+    const activeService = selectedService
+    const activeTime = selectedTime
+
+    if (!activeDate || !activeService || !activeTime) {
+      return
+    }
+
+    setIsSubmitting(true)
+    setErrorMessage(null)
+
+    try {
+      const booking = await createBooking({
+        shopId,
+        serviceId: activeService.id,
+        date: toIsoDateOnly(activeDate),
+        timeSlot: activeTime,
+      })
+
+      router.push(`/bookings/confirmation?bookingId=${encodeURIComponent(booking.id)}`)
+    } catch (error) {
+      setErrorMessage(
+        error instanceof ApiError
+          ? error.message
+          : error instanceof Error
+          ? error.message
+          : "Failed to create booking"
+      )
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  if (isLoadingDetails) {
+    return (
+      <section className="bg-background py-8 lg:py-12">
+        <div className="mx-auto max-w-3xl px-4 lg:px-8 text-sm text-muted-foreground">Loading booking details...</div>
+      </section>
+    )
+  }
+
+  if (!shop || !selectedService) {
+    return (
+      <section className="bg-background py-8 lg:py-12">
+        <div className="mx-auto max-w-3xl px-4 lg:px-8">
+          <p className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+            {errorMessage || "Booking details are unavailable for this shop."}
+          </p>
+        </div>
+      </section>
+    )
   }
 
   return (
     <section className="bg-background py-8 lg:py-12">
       <div className="mx-auto max-w-3xl px-4 lg:px-8">
         <Link
-          href="/shops/1"
+          href={`/shops/${shopId}`}
           className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -50,11 +303,10 @@ export function BookingFlow() {
         <div className="mb-8">
           <h1 className="text-2xl font-bold tracking-tight text-foreground">Book a Slot</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            FreshSpin Laundry Hub - Priority Wash & Fold
+            {shop.name} - {selectedService.name}
           </p>
         </div>
 
-        {/* Step Indicator */}
         <div className="mb-10">
           <div className="flex items-center justify-between">
             {steps.map((step, i) => (
@@ -95,7 +347,12 @@ export function BookingFlow() {
           </div>
         </div>
 
-        {/* Step Content */}
+        {errorMessage && (
+          <p className="mb-4 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+            {errorMessage}
+          </p>
+        )}
+
         <Card className="border-border">
           <CardContent className="p-6">
             {currentStep === 0 && (
@@ -110,7 +367,7 @@ export function BookingFlow() {
                   mode="single"
                   selected={selectedDate}
                   onSelect={setSelectedDate}
-                  disabled={(date) => date < new Date()}
+                  disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                   className="rounded-lg border border-border"
                 />
                 {selectedDate && (
@@ -134,28 +391,42 @@ export function BookingFlow() {
                     Choose an available time slot for drop-off
                   </p>
                 </div>
-                <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
-                  {timeSlots.map((time) => {
-                    const isUnavailable = unavailableSlots.includes(time)
-                    const isSelected = selectedTime === time
-                    return (
-                      <button
-                        key={time}
-                        onClick={() => !isUnavailable && setSelectedTime(time)}
-                        disabled={isUnavailable}
-                        className={`flex items-center justify-center rounded-lg border px-3 py-3 text-sm font-medium transition-all ${
-                          isSelected
-                            ? "border-primary bg-primary text-primary-foreground"
-                            : isUnavailable
-                            ? "cursor-not-allowed border-border bg-muted text-muted-foreground/50 line-through"
-                            : "border-border bg-background text-foreground hover:border-primary/40 hover:bg-primary/5"
-                        }`}
-                      >
-                        {time}
-                      </button>
-                    )
-                  })}
-                </div>
+                {isLoadingSlots ? (
+                  <p className="text-sm text-muted-foreground">Loading available slots...</p>
+                ) : slots.length === 0 ? (
+                  <p className="rounded-lg border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
+                    No slots available for the selected date.
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    {slots.map((slot) => {
+                      const isUnavailable = slot.available <= 0
+                      const isSelected = selectedTime === slot.startTime
+                      return (
+                        <button
+                          key={slot.slotConfigId}
+                          onClick={() => !isUnavailable && setSelectedTime(slot.startTime)}
+                          disabled={isUnavailable}
+                          className={`flex flex-col items-center justify-center rounded-lg border px-3 py-3 text-sm font-medium transition-all ${
+                            isSelected
+                              ? "border-primary bg-primary text-primary-foreground"
+                              : isUnavailable
+                              ? "cursor-not-allowed border-border bg-muted text-muted-foreground/50"
+                              : "border-border bg-background text-foreground hover:border-primary/40 hover:bg-primary/5"
+                          }`}
+                        >
+                          <span>{formatBackendTime(slot.startTime)}</span>
+                          <span className="text-xs opacity-80">{slot.available} available</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
+                {serviceNotice && (
+                  <p className="rounded-lg border border-primary/20 bg-primary/5 p-3 text-xs text-primary">
+                    {serviceNotice}
+                  </p>
+                )}
                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1.5">
                     <div className="h-3 w-3 rounded border border-border bg-background" />
@@ -232,13 +503,13 @@ export function BookingFlow() {
                 </div>
                 <Card className="border-border bg-secondary/30">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-base">FreshSpin Laundry Hub</CardTitle>
-                    <p className="text-xs text-muted-foreground">123 Osmeña Blvd, Cebu City</p>
+                    <CardTitle className="text-base">{shop.name}</CardTitle>
+                    <p className="text-xs text-muted-foreground">{shop.address}</p>
                   </CardHeader>
                   <CardContent className="flex flex-col gap-3">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Service</span>
-                      <Badge className="bg-primary text-primary-foreground">Priority Wash & Fold</Badge>
+                      <Badge className="bg-primary text-primary-foreground">{selectedService.name}</Badge>
                     </div>
                     <Separator />
                     <div className="flex items-center justify-between text-sm">
@@ -254,7 +525,7 @@ export function BookingFlow() {
                     <Separator />
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Time Slot</span>
-                      <span className="font-medium text-foreground">{selectedTime || "Not selected"}</span>
+                      <span className="font-medium text-foreground">{selectedTime ? formatBackendTime(selectedTime) : "Not selected"}</span>
                     </div>
                     <Separator />
                     <div className="flex items-center justify-between text-sm">
@@ -266,7 +537,7 @@ export function BookingFlow() {
                     <Separator />
                     <div className="flex items-center justify-between text-base font-semibold">
                       <span className="text-foreground">Total</span>
-                      <span className="text-primary">PHP 200.00</span>
+                      <span className="text-primary">PHP {selectedService.price.toFixed(2)}</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -275,12 +546,11 @@ export function BookingFlow() {
           </CardContent>
         </Card>
 
-        {/* Navigation */}
         <div className="mt-6 flex items-center justify-between">
           <Button
             variant="outline"
             onClick={() => setCurrentStep((s) => Math.max(0, s - 1))}
-            disabled={currentStep === 0}
+            disabled={currentStep === 0 || isSubmitting}
             className="gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -290,22 +560,24 @@ export function BookingFlow() {
           {currentStep < 3 ? (
             <Button
               onClick={() => setCurrentStep((s) => Math.min(3, s + 1))}
-              disabled={!canProceed()}
+              disabled={!canProceed() || isSubmitting}
               className="gap-2"
             >
               Next
               <ArrowRight className="h-4 w-4" />
             </Button>
           ) : (
-            <Button asChild className="gap-2">
-              <Link href="/bookings/confirmation">
-                Proceed to Payment
-                <ArrowRight className="h-4 w-4" />
-              </Link>
+            <Button onClick={handleSubmitBooking} disabled={isSubmitting} className="gap-2">
+              {isSubmitting ? "Creating booking..." : "Proceed to Payment"}
+              <ArrowRight className="h-4 w-4" />
             </Button>
           )}
         </div>
       </div>
     </section>
   )
+}
+
+function getAvailableCount(slots: SlotApi[]): number {
+  return slots.reduce((total, slot) => total + Math.max(0, slot.available), 0)
 }

@@ -6,12 +6,35 @@ import { Clock, MapPin } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { cebuInstituteOfTechnology, partnerShops, type PartnerShop } from "@/lib/partner-shops"
 
 type GoogleMapsWindow = Window & {
   google?: {
     maps?: any
   }
+}
+
+export type DashboardShop = {
+  id: string
+  name: string
+  address: string
+  hours: string
+  rating: number
+  location: {
+    lat: number
+    lng: number
+  } | null
+  standardPrice: number
+  priorityPrice: number
+  prioritySlots: number
+}
+
+const cebuInstituteOfTechnology = {
+  name: "Cebu Institute of Technology - University",
+  address: "N. Bacalso Ave., Cebu City, Philippines",
+  location: {
+    lat: 10.294665473840583,
+    lng: 123.88110178079,
+  },
 }
 
 let googleMapsLoader: Promise<void> | null = null
@@ -104,11 +127,12 @@ function loadGoogleMaps(apiKey: string) {
 }
 
 type PartnerShopsMapProps = {
-  activeShop: PartnerShop | undefined
-  onSelectShop: (shopId: number) => void
+  shops: DashboardShop[]
+  activeShopId: string | null
+  onSelectShop: (shopId: string) => void
 }
 
-export function PartnerShopsMap({ activeShop, onSelectShop }: PartnerShopsMapProps) {
+export function PartnerShopsMap({ shops, activeShopId, onSelectShop }: PartnerShopsMapProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<any>(null)
   const markersRef = useRef<any[]>([])
@@ -117,6 +141,12 @@ export function PartnerShopsMap({ activeShop, onSelectShop }: PartnerShopsMapPro
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   useEffect(() => {
+    const mappableShops = shops.filter((shop) => !!shop.location)
+
+    if (mappableShops.length === 0) {
+      return
+    }
+
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
 
     if (!apiKey) {
@@ -142,8 +172,8 @@ export function PartnerShopsMap({ activeShop, onSelectShop }: PartnerShopsMapPro
         }
 
         const map = new maps.Map(mapContainerRef.current, {
-          center: cebuInstituteOfTechnology.location,
-          zoom: 15,
+          center: mappableShops[0]?.location ?? cebuInstituteOfTechnology.location,
+          zoom: 14,
           mapTypeControl: false,
           streetViewControl: false,
           fullscreenControl: false,
@@ -170,14 +200,14 @@ export function PartnerShopsMap({ activeShop, onSelectShop }: PartnerShopsMapPro
           infoWindowRef.current?.open({ map, anchor: citMarker })
         })
 
-        markersRef.current = partnerShops.map((shop) => {
+        markersRef.current = mappableShops.map((shop, index) => {
           const marker = new maps.Marker({
             map,
             position: shop.location,
             title: shop.name,
             icon: laundryIcon,
             label: {
-              text: String(shop.id),
+              text: String(index + 1),
               color: "#ffffff",
               fontSize: "11px",
               fontWeight: "700",
@@ -208,20 +238,24 @@ export function PartnerShopsMap({ activeShop, onSelectShop }: PartnerShopsMapPro
 
     return () => {
       cancelled = true
-
       markersRef.current.forEach((marker) => marker.setMap?.(null))
       markersRef.current = []
       infoWindowRef.current?.close?.()
     }
-  }, [onSelectShop])
+  }, [onSelectShop, shops])
 
   useEffect(() => {
-    if (!mapRef.current || !activeShop) {
+    if (!mapRef.current || !activeShopId) {
+      return
+    }
+
+    const activeShop = shops.find((shop) => shop.id === activeShopId)
+    if (!activeShop?.location) {
       return
     }
 
     mapRef.current.panTo(activeShop.location)
-  }, [activeShop])
+  }, [activeShopId, shops])
 
   return (
     <Card className="border-border shadow-sm">
@@ -248,17 +282,12 @@ export function PartnerShopsMap({ activeShop, onSelectShop }: PartnerShopsMapPro
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-foreground">Available Shops Near You</h2>
           <Badge variant="secondary" className="border-none bg-secondary/80 text-foreground">
-            {partnerShops.length} shops
+            {shops.length} shops
           </Badge>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {partnerShops.map((shop) => {
-            const isActive = activeShop?.id === shop.id
-            const standardService = shop.services.find((s) => s.type === "STANDARD")
-            const priorityService = shop.services.find((s) => s.type === "PRIORITY")
-            const standardPrice = standardService?.price ?? 0
-            const priorityPrice = priorityService?.price ?? 0
-            const prioritySlots = priorityService?.slotsRemaining ?? 0
+          {shops.map((shop) => {
+            const isActive = activeShopId === shop.id
 
             return (
               <div
@@ -270,7 +299,7 @@ export function PartnerShopsMap({ activeShop, onSelectShop }: PartnerShopsMapPro
                 <div className="flex flex-col gap-3 p-4">
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="text-base font-semibold text-foreground">{shop.name}</h3>
-                    <Badge className="border-none bg-warning/10 text-warning">⭐ {shop.rating}</Badge>
+                    <Badge className="border-none bg-warning/10 text-warning">⭐ {shop.rating.toFixed(1)}</Badge>
                   </div>
 
                   <div className="flex items-start gap-1.5 text-xs text-muted-foreground">
@@ -287,25 +316,25 @@ export function PartnerShopsMap({ activeShop, onSelectShop }: PartnerShopsMapPro
                     <div className="flex items-center justify-between text-xs">
                       <div className="flex flex-col gap-1">
                         <span className="text-muted-foreground">Standard</span>
-                        <span className="font-bold text-foreground">PHP {standardPrice}</span>
+                        <span className="font-bold text-foreground">PHP {shop.standardPrice}</span>
                       </div>
                       <div className="h-8 w-px bg-border" />
                       <div className="flex flex-col gap-1">
                         <span className="text-muted-foreground">Priority</span>
-                        <span className="font-bold text-foreground">PHP {priorityPrice}</span>
+                        <span className="font-bold text-foreground">PHP {shop.priorityPrice}</span>
                       </div>
                     </div>
                   </div>
 
                   <p
                     className={`text-sm font-medium ${
-                      prioritySlots > 0
+                      shop.prioritySlots > 0
                         ? "text-green-600 dark:text-green-400"
                         : "text-red-600 dark:text-red-400"
                     }`}
                   >
-                    {prioritySlots > 0
-                      ? `${prioritySlots} priority slots available`
+                    {shop.prioritySlots > 0
+                      ? `${shop.prioritySlots} priority slots available`
                       : "No priority slots available"}
                   </p>
                 </div>
@@ -326,18 +355,13 @@ export function PartnerShopsMap({ activeShop, onSelectShop }: PartnerShopsMapPro
   )
 }
 
-function buildInfoWindowContent(shop: PartnerShop) {
-  const services = shop.services
-    .slice(0, 2)
-    .map((service) => `<li>${service.name} - PHP ${service.price}</li>`)
-    .join("")
-
+function buildInfoWindowContent(shop: DashboardShop) {
   return `
     <div style="min-width:220px;max-width:260px;font-family:Arial,sans-serif;line-height:1.5;">
       <strong>${shop.name}</strong><br />
       <span>${shop.address}</span><br />
-      <span>Rating: ${shop.rating}</span>
-      <ul style="padding-left:18px;margin:10px 0 0;">${services}</ul>
+      <span>Standard: PHP ${shop.standardPrice}</span><br />
+      <span>Priority: PHP ${shop.priorityPrice}</span>
     </div>
   `
 }
