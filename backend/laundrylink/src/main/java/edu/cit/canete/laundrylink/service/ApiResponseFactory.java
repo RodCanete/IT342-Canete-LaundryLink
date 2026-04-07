@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -29,5 +31,13 @@ public class ApiResponseFactory {
         response.put("error", error);
         response.put("timestamp", Instant.now());
         return response;
+    }
+
+    public ResponseEntity<Map<String, Object>> successResponse(Object data, HttpStatus status) {
+        return ResponseEntity.status(status).body(success(data));
+    }
+
+    public ResponseEntity<Map<String, Object>> errorResponse(String code, String message, HttpStatus status) {
+        return ResponseEntity.status(status).body(error(code, message));
     }
 }

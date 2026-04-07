@@ -26,6 +26,62 @@ export class ApiError extends Error {
   }
 }
 
+interface RequestOptionsDecorator {
+  decorate(options: RequestInit): RequestInit
+}
+
+class JsonContentTypeDecorator implements RequestOptionsDecorator {
+  decorate(options: RequestInit): RequestInit {
+    const headers = normalizeHeaders(options.headers)
+    return {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...headers,
+      },
+    }
+  }
+}
+
+class AuthorizationHeaderDecorator implements RequestOptionsDecorator {
+  constructor(private readonly token: string | null) {}
+
+  decorate(options: RequestInit): RequestInit {
+    if (!this.token) {
+      return options
+    }
+
+    const headers = normalizeHeaders(options.headers)
+    return {
+      ...options,
+      headers: {
+        ...headers,
+        Authorization: `Bearer ${this.token}`,
+      },
+    }
+  }
+}
+
+function normalizeHeaders(headers: HeadersInit | undefined): Record<string, string> {
+  if (!headers) {
+    return {}
+  }
+
+  if (headers instanceof Headers) {
+    return Object.fromEntries(headers.entries())
+  }
+
+  if (Array.isArray(headers)) {
+    return Object.fromEntries(headers)
+  }
+
+  return headers as Record<string, string>
+}
+
+function applyDecorators(options: RequestInit, decorators: RequestOptionsDecorator[]): RequestInit {
+  return decorators.reduce((currentOptions, decorator) => decorator.decorate(currentOptions), options)
+}
+
 /**
  * Generic fetch wrapper with standard error handling
  */
@@ -36,20 +92,14 @@ export async function apiRequest<T>(
   const url = `${API_BASE_URL}${endpoint}`;
 
   const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
-
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...(options.headers as Record<string, string>),
-  };
-
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
+  const decoratedOptions = applyDecorators(options, [
+    new JsonContentTypeDecorator(),
+    new AuthorizationHeaderDecorator(token),
+  ])
 
   try {
     const response = await fetch(url, {
-      ...options,
-      headers,
+      ...decoratedOptions,
     });
 
     const data = (await response.json()) as ApiResponse<T> & {

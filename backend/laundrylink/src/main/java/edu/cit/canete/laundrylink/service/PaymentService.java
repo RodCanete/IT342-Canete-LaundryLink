@@ -10,7 +10,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.cit.canete.laundrylink.repository.BookingRepository;
 import edu.cit.canete.laundrylink.repository.PaymentRepository;
+import edu.cit.canete.laundrylink.service.event.PaymentSucceededEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +39,8 @@ public class PaymentService {
 
     private static final String DEFAULT_CURRENCY = "PHP";
 
-    private final HttpClient httpClient = HttpClient.newHttpClient();
+    @Autowired
+    private HttpClient httpClient;
 
     @Value("${app.paymongo.base-url}")
     private String payMongoBaseUrl;
@@ -64,13 +67,13 @@ public class PaymentService {
     private BookingRepository bookingRepository;
 
     @Autowired
-    private BookingService bookingService;
-
-    @Autowired
     private AuthenticatedUserService authenticatedUserService;
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     public Map<String, Object> createIntent(CreatePaymentIntentRequest request, String authorizationHeader) {
         User user = authenticatedUserService.requireUser(authorizationHeader);
@@ -139,7 +142,7 @@ public class PaymentService {
         payment.setStatus(mappedStatus);
         if (mappedStatus == PaymentStatus.SUCCEEDED) {
             payment.setPaidAt(LocalDateTime.now());
-            bookingService.markPaid(payment.getBooking().getId());
+            publishPaymentSucceeded(payment.getBooking().getId());
         }
 
         paymentRepository.save(payment);
@@ -189,7 +192,7 @@ public class PaymentService {
                 if (payment.getPaidAt() == null) {
                     payment.setPaidAt(LocalDateTime.now());
                 }
-                bookingService.markPaid(payment.getBooking().getId());
+                publishPaymentSucceeded(payment.getBooking().getId());
                 payment.getBooking().setStatus(BookingStatus.PAID);
             }
 
@@ -495,6 +498,10 @@ public class PaymentService {
         if (value != null && !value.isBlank()) {
             target.add(value);
         }
+    }
+
+    private void publishPaymentSucceeded(UUID bookingId) {
+        eventPublisher.publishEvent(new PaymentSucceededEvent(bookingId));
     }
 
     private Map<String, Object> toPaymentMap(Payment payment, String eventType) {
