@@ -37,16 +37,17 @@ export interface GoogleLoginData {
   idToken: string;
 }
 
+type DashboardPathStrategy = () => string
+
+const dashboardPathStrategies: Partial<Record<AuthRole, DashboardPathStrategy>> = {
+  SHOP_OWNER: () => '/shop-owner/dashboard',
+  ADMIN: () => '/admin',
+  CUSTOMER: () => '/customer/dashboard',
+}
+
 export function getDashboardPath(role: AuthRole | string | null | undefined): string {
-  switch (role) {
-    case 'SHOP_OWNER':
-      return '/shop-owner/dashboard';
-    case 'ADMIN':
-      return '/admin';
-    case 'CUSTOMER':
-    default:
-      return '/customer/dashboard';
-  }
+  const strategy = role ? dashboardPathStrategies[role as AuthRole] : undefined
+  return (strategy ?? dashboardPathStrategies.CUSTOMER)!()
 }
 
 function storeAuthSession(response: AuthResponse): void {
