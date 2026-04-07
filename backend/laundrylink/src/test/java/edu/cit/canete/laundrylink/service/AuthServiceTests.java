@@ -7,11 +7,14 @@ import edu.cit.canete.laundrylink.entity.User;
 import edu.cit.canete.laundrylink.repository.UserRepository;
 import edu.cit.canete.laundrylink.security.GoogleTokenVerifier;
 import edu.cit.canete.laundrylink.security.JwtUtil;
+import edu.cit.canete.laundrylink.service.adapter.GoogleOAuthProfile;
+import edu.cit.canete.laundrylink.service.adapter.GooglePayloadAdapter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Map;
 import java.util.Optional;
@@ -34,12 +37,19 @@ class AuthServiceTests {
     @Mock
     private GoogleTokenVerifier googleTokenVerifier;
 
+    @Mock
+    private BCryptPasswordEncoder encoder;
+
+    @Mock
+    private GooglePayloadAdapter googlePayloadAdapter;
+
     @InjectMocks
     private AuthService authService;
 
     @Test
     void registerDefaultsToCustomerWhenRoleIsMissing() {
         when(userRepository.existsByEmail("customer@example.com")).thenReturn(false);
+        when(encoder.encode("SecurePass123")).thenReturn("encoded-password");
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> savedUser(invocation.getArgument(0)));
         when(jwtUtil.generateToken("customer@example.com", "CUSTOMER")).thenReturn("token-customer");
 
@@ -59,6 +69,7 @@ class AuthServiceTests {
     @Test
     void registerAllowsShopOwnerRole() {
         when(userRepository.existsByEmail("owner@example.com")).thenReturn(false);
+        when(encoder.encode("SecurePass123")).thenReturn("encoded-password");
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> savedUser(invocation.getArgument(0)));
         when(jwtUtil.generateToken("owner@example.com", "SHOP_OWNER")).thenReturn("token-owner");
 
@@ -115,6 +126,7 @@ class AuthServiceTests {
         payload.set("family_name", "User");
 
         when(googleTokenVerifier.verify("google-token")).thenReturn(payload);
+        when(googlePayloadAdapter.adapt(payload)).thenReturn(new GoogleOAuthProfile("google@example.com", "google-subject", "Google", "User"));
         when(userRepository.findByOauthProviderAndOauthId("GOOGLE", "google-subject")).thenReturn(Optional.empty());
         when(userRepository.findByEmail("google@example.com")).thenReturn(Optional.empty());
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> savedUser(invocation.getArgument(0)));

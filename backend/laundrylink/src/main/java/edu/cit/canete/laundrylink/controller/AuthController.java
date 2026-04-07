@@ -1,6 +1,7 @@
 package edu.cit.canete.laundrylink.controller;
 
 import edu.cit.canete.laundrylink.dto.*;
+import edu.cit.canete.laundrylink.service.ApiResponseFactory;
 import edu.cit.canete.laundrylink.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Instant;
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -20,26 +19,16 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
+    @Autowired
+    private ApiResponseFactory responseFactory;
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest req) {
         try {
             var data = authService.register(req);
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("data", data);
-            response.put("error", null);
-            response.put("timestamp", Instant.now());
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            return responseFactory.successResponse(data, HttpStatus.CREATED);
         } catch (RuntimeException e) {
-            Map<String, Object> error = new HashMap<>();
-            error.put("code", "AUTH-409");
-            error.put("message", e.getMessage());
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", false);
-            response.put("data", null);
-            response.put("error", error);
-            response.put("timestamp", Instant.now());
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+            return responseFactory.errorResponse("AUTH-409", e.getMessage(), HttpStatus.CONFLICT);
         }
     }
 
@@ -47,22 +36,9 @@ public class AuthController {
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest req) {
         try {
             var data = authService.login(req);
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("data", data);
-            response.put("error", null);
-            response.put("timestamp", Instant.now());
-            return ResponseEntity.ok(response);
+            return responseFactory.successResponse(data, HttpStatus.OK);
         } catch (RuntimeException e) {
-            Map<String, Object> error = new HashMap<>();
-            error.put("code", "AUTH-001");
-            error.put("message", e.getMessage());
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", false);
-            response.put("data", null);
-            response.put("error", error);
-            response.put("timestamp", Instant.now());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            return responseFactory.errorResponse("AUTH-001", e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -70,45 +46,19 @@ public class AuthController {
     public ResponseEntity<?> googleLogin(@Valid @RequestBody GoogleOAuthRequest req) {
         try {
             var data = authService.googleLogin(req);
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("data", data);
-            response.put("error", null);
-            response.put("timestamp", Instant.now());
-            return ResponseEntity.ok(response);
+            return responseFactory.successResponse(data, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
-            Map<String, Object> error = new HashMap<>();
-            error.put("code", "AUTH-400");
-            error.put("message", e.getMessage());
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", false);
-            response.put("data", null);
-            response.put("error", error);
-            response.put("timestamp", Instant.now());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            return responseFactory.errorResponse("AUTH-400", e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (RuntimeException e) {
-            Map<String, Object> error = new HashMap<>();
-            error.put("code", "AUTH-002");
-            error.put("message", e.getMessage());
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", false);
-            response.put("data", null);
-            response.put("error", error);
-            response.put("timestamp", Instant.now());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            return responseFactory.errorResponse("AUTH-002", e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
 
     @GetMapping("/health")
     public ResponseEntity<?> health() {
-        Map<String, Object> data = new HashMap<>();
+        Map<String, Object> data = new java.util.HashMap<>();
         data.put("status", "healthy");
         data.put("service", "LaundryLink Auth");
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("data", data);
-        response.put("error", null);
-        response.put("timestamp", Instant.now());
-        return ResponseEntity.ok(response);
+        return responseFactory.successResponse(data, HttpStatus.OK);
     }
 }

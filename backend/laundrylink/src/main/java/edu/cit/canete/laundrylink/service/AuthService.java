@@ -6,6 +6,8 @@ import edu.cit.canete.laundrylink.entity.UserRole;
 import edu.cit.canete.laundrylink.repository.UserRepository;
 import edu.cit.canete.laundrylink.security.GoogleTokenVerifier;
 import edu.cit.canete.laundrylink.security.JwtUtil;
+import edu.cit.canete.laundrylink.service.adapter.GoogleOAuthProfile;
+import edu.cit.canete.laundrylink.service.adapter.GooglePayloadAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,7 +29,11 @@ public class AuthService {
     @Autowired
     private GoogleTokenVerifier googleTokenVerifier;
 
-    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+    @Autowired
+    private BCryptPasswordEncoder encoder;
+
+    @Autowired
+    private GooglePayloadAdapter googlePayloadAdapter;
 
     public Map<String, Object> register(RegisterRequest req) {
         if (userRepository.existsByEmail(req.getEmail())) {
@@ -66,8 +72,9 @@ public class AuthService {
         }
 
         GoogleIdToken.Payload payload = googleTokenVerifier.verify(req.getIdToken());
-        String email = payload.getEmail();
-        String oauthId = payload.getSubject();
+        GoogleOAuthProfile profile = googlePayloadAdapter.adapt(payload);
+        String email = profile.email();
+        String oauthId = profile.oauthId();
 
         if (email == null || email.isBlank()) {
             throw new RuntimeException("Google account did not return an email address");
@@ -80,7 +87,7 @@ public class AuthService {
         User user = userRepository.findByOauthProviderAndOauthId("GOOGLE", oauthId)
             .orElseGet(() -> userRepository.findByEmail(email)
                 .map(existingUser -> linkGoogleAccount(existingUser, oauthId))
-                .orElseGet(() -> createGoogleUser(payload, email, oauthId)));
+                .orElseGet(() -> createGoogleUser(profile)));
 
         return buildAuthResponse(user);
     }
@@ -91,51 +98,16 @@ public class AuthService {
         return userRepository.save(user);
     }
 
-    private User createGoogleUser(GoogleIdToken.Payload payload, String email, String oauthId) {
+    private User createGoogleUser(GoogleOAuthProfile profile) {
         User user = new User();
-        user.setEmail(email);
+        user.setEmail(profile.email());
         user.setOauthProvider("GOOGLE");
-        user.setOauthId(oauthId);
+        user.setOauthId(profile.oauthId());
         user.setRole(UserRole.CUSTOMER.name());
 
-        String fullName = payload.get("name") != null ? payload.get("name").toString() : null;
-        String givenName = payload.get("given_name") != null ? payload.get("given_name").toString() : null;
-        String familyName = payload.get("family_name") != null ? payload.get("family_name").toString() : null;
-
-        if (givenName == null || givenName.isBlank() || familyName == null || familyName.isBlank()) {
-            String[] nameParts = splitGoogleName(fullName);
-            if (givenName == null || givenName.isBlank()) {
-                givenName = nameParts[0];
-            }
-            if (familyName == null || familyName.isBlank()) {
-                familyName = nameParts[1];
-            }
-        }
-
-        user.setFirstName(givenName);
-        user.setLastName(familyName);
+        user.setFirstName(profile.firstName());
+        user.setLastName(profile.lastName());
         return userRepository.save(user);
-    }
-
-    private String[] splitGoogleName(String fullName) {
-        if (fullName == null || fullName.isBlank()) {
-            return new String[] {"Google", "User"};
-        }
-
-        String trimmed = fullName.trim();
-        int firstSpaceIndex = trimmed.indexOf(' ');
-
-        if (firstSpaceIndex < 0) {
-            return new String[] {trimmed, "User"};
-        }
-
-        String firstName = trimmed.substring(0, firstSpaceIndex).trim();
-        String lastName = trimmed.substring(firstSpaceIndex + 1).trim();
-        if (lastName.isBlank()) {
-            lastName = "User";
-        }
-
-        return new String[] {firstName.isBlank() ? "Google" : firstName, lastName};
     }
 
     private Map<String, Object> buildAuthResponse(User user) {
