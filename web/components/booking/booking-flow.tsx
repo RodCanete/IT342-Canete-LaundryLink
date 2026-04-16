@@ -1,8 +1,6 @@
-"use client"
 
 import { useEffect, useMemo, useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { Link, useNavigate } from "react-router-dom"
 import { ArrowLeft, ArrowRight, Calendar, Clock, Upload, FileText, CheckCircle2, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -36,7 +34,7 @@ type BookingFlowProps = {
 }
 
 export function BookingFlow({ shopId, preferredServiceId }: BookingFlowProps) {
-  const router = useRouter()
+  const navigate = useNavigate()
   const [currentStep, setCurrentStep] = useState(0)
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
   const [selectedTime, setSelectedTime] = useState<string | null>(null)
@@ -278,7 +276,7 @@ export function BookingFlow({ shopId, preferredServiceId }: BookingFlowProps) {
         window.location.assign(paymentIntent.checkoutUrl)
       } catch (paymentError) {
         console.error("Failed to initialize payment", paymentError)
-        router.push(
+        navigate(
           `/bookings/confirmation?bookingId=${encodeURIComponent(booking.id)}&paymentInitFailed=1`
         )
       }

@@ -1,8 +1,5 @@
-"use client"
-
-import Link from "next/link"
 import { useState, FormEvent } from "react"
-import { useRouter } from "next/navigation"
+import { Link, useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -15,13 +12,13 @@ import { ApiError } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
 
 export default function LoginPage() {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { toast } = useToast()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  
+
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -45,7 +42,7 @@ export default function LoginPage() {
 
       const redirectPath = getDashboardPath(response.user.role)
       setTimeout(() => {
-        router.push(redirectPath)
+        navigate(redirectPath)
       }, 1000)
     } catch (err) {
       if (err instanceof ApiError) {
@@ -84,7 +81,7 @@ export default function LoginPage() {
 
       const redirectPath = getDashboardPath(response.user.role)
       setTimeout(() => {
-        router.push(redirectPath)
+        navigate(redirectPath)
       }, 1000)
     } catch (err) {
       if (err instanceof ApiError) {
@@ -104,7 +101,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 py-12">
-      <Link href="/" className="mb-8 flex items-center gap-2.5">
+      <Link to="/" className="mb-8 flex items-center gap-2.5">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
           <WashingMachine className="h-6 w-6 text-primary-foreground" />
         </div>
@@ -152,7 +149,7 @@ export default function LoginPage() {
                 <span>{error}</span>
               </div>
             )}
-            
+
             <div className="flex flex-col gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -169,7 +166,7 @@ export default function LoginPage() {
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                <Link href="#" className="text-xs text-primary hover:underline">
+                <Link to="#" className="text-xs text-primary hover:underline">
                   Forgot password?
                 </Link>
               </div>
@@ -206,7 +203,7 @@ export default function LoginPage() {
 
           <p className="text-center text-sm text-muted-foreground">
             {"Don't have an account? "}
-            <Link href="/register" className="font-medium text-primary hover:underline">
+            <Link to="/register" className="font-medium text-primary hover:underline">
               Create one
             </Link>
           </p>

@@ -1,7 +1,6 @@
-"use client"
 
 import { useEffect, useState, type ReactNode } from "react"
-import { useRouter } from "next/navigation"
+import { useNavigate } from "react-router-dom"
 import { getCurrentUser, getDashboardPath, isAuthenticated, type AuthRole } from "@/lib/auth"
 
 type DashboardGuardProps = {
@@ -10,24 +9,24 @@ type DashboardGuardProps = {
 }
 
 export function DashboardGuard({ allowedRole, children }: DashboardGuardProps) {
-  const router = useRouter()
+  const navigate = useNavigate()
   const [resolved, setResolved] = useState(false)
 
   useEffect(() => {
     if (!isAuthenticated()) {
-      router.replace("/login")
+      navigate("/login")
       return
     }
 
     const user = getCurrentUser()
 
     if (!user) {
-      router.replace("/login")
+      navigate("/login")
       return
     }
 
     if (user.role !== allowedRole) {
-      router.replace(getDashboardPath(user.role))
+      navigate(getDashboardPath(user.role))
       return
     }
 

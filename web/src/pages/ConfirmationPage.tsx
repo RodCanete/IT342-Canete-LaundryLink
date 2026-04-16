@@ -1,13 +1,13 @@
+import { useSearchParams } from "react-router-dom"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { BookingConfirmation } from "@/components/booking/booking-confirmation"
 
-type ConfirmationPageProps = {
-  searchParams: Promise<{ bookingId?: string; payment?: string; paymentInitFailed?: string }>
-}
-
-export default async function ConfirmationPage({ searchParams }: ConfirmationPageProps) {
-  const { bookingId, payment, paymentInitFailed } = await searchParams
+export default function ConfirmationPage() {
+  const [searchParams] = useSearchParams()
+  const bookingId = searchParams.get('bookingId') ?? undefined
+  const payment = searchParams.get('payment') ?? undefined
+  const paymentInitFailed = searchParams.get('paymentInitFailed') === '1'
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -16,7 +16,7 @@ export default async function ConfirmationPage({ searchParams }: ConfirmationPag
         <BookingConfirmation
           bookingId={bookingId}
           paymentReturnStatus={payment}
-          paymentInitFailed={paymentInitFailed === "1"}
+          paymentInitFailed={paymentInitFailed}
         />
       </main>
       <Footer />

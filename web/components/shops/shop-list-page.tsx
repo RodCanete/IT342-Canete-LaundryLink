@@ -1,6 +1,5 @@
-"use client"
 
-import Link from "next/link"
+import { Link } from "react-router-dom"
 import { useEffect, useState } from "react"
 import { MapPin, Clock, Star, Search, Filter } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
@@ -181,7 +180,7 @@ export function ShopListPage() {
                 </div>
 
                 <Button asChild size="sm" className="w-full">
-                  <Link href={`/shops/${shop.id}`}>View Shop & Book</Link>
+                  <Link to={`/shops/${shop.id}`}>View Shop & Book</Link>
                 </Button>
               </CardContent>
             </Card>

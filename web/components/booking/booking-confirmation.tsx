@@ -1,6 +1,5 @@
-"use client"
 
-import Link from "next/link"
+import { Link } from "react-router-dom"
 import { useEffect, useMemo, useState } from "react"
 import { CheckCircle2, Download, QrCode, ArrowRight, Mail, AlertCircle, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -359,7 +358,7 @@ export function BookingConfirmation({
                 Download QR Code
               </Button>
               <Button asChild className="w-full gap-2">
-                <Link href="/bookings">
+                <Link to="/bookings">
                   View My Bookings
                   <ArrowRight className="h-4 w-4" />
                 </Link>

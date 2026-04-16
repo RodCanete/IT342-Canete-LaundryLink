@@ -1,4 +1,4 @@
-import Link from "next/link"
+import { Link } from "react-router-dom"
 import { CalendarCheck2, Landmark, Settings2, Sparkles, Users } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -38,13 +38,13 @@ export function ShopOwnerDashboard() {
           </div>
         </div>
         <nav className="flex flex-1 flex-col gap-1 p-4">
-          <Link href="/shop-owner/dashboard" className="rounded-lg bg-primary/10 px-3 py-2.5 text-sm font-medium text-primary">
+          <Link to="/shop-owner/dashboard" className="rounded-lg bg-primary/10 px-3 py-2.5 text-sm font-medium text-primary">
             Overview
           </Link>
-          <Link href="/shops" className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
+          <Link to="/shops" className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
             View Shops
           </Link>
-          <Link href="/bookings" className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
+          <Link to="/bookings" className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
             Customer Bookings
           </Link>
         </nav>
@@ -65,10 +65,10 @@ export function ShopOwnerDashboard() {
             </div>
             <div className="flex flex-wrap gap-3">
               <Button asChild variant="outline">
-                <Link href="/shop-owner/dashboard">Refresh View</Link>
+                <Link to="/shop-owner/dashboard">Refresh View</Link>
               </Button>
               <Button asChild>
-                <Link href="/shops">Open Shop List</Link>
+                <Link to="/shops">Open Shop List</Link>
               </Button>
             </div>
           </div>

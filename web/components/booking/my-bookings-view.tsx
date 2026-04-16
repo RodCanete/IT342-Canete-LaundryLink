@@ -1,4 +1,3 @@
-"use client"
 
 import { useEffect, useMemo, useState } from "react"
 import { QrCode, FileText, ChevronRight, Filter } from "lucide-react"
