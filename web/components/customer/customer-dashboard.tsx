@@ -1,6 +1,5 @@
-"use client"
 
-import Link from "next/link"
+import { Link } from "react-router-dom"
 import { useEffect, useMemo, useState } from "react"
 import { CalendarCheck2, Clock3, CreditCard, MapPinned } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -138,13 +137,13 @@ export function CustomerDashboard() {
             </div>
             <div className="flex flex-wrap gap-3">
               <Button asChild>
-                <Link href="/shops">Book a Slot</Link>
+                <Link to="/shops">Book a Slot</Link>
               </Button>
               <Button asChild variant="secondary">
-                <Link href="/bookings">My Bookings</Link>
+                <Link to="/bookings">My Bookings</Link>
               </Button>
               <Button asChild variant="outline">
-                <Link href="/shops">Browse Shops</Link>
+                <Link to="/shops">Browse Shops</Link>
               </Button>
             </div>
           </div>

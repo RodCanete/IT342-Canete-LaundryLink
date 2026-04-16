@@ -1,4 +1,4 @@
-import Link from "next/link"
+import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 
@@ -14,7 +14,7 @@ export function CtaSection() {
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Button asChild size="lg" variant="secondary" className="min-w-[180px] gap-2">
-            <Link href="/register">
+            <Link to="/register">
               Get Started
               <ArrowRight className="h-4 w-4" />
             </Link>
@@ -25,7 +25,7 @@ export function CtaSection() {
             variant="outline"
             className="min-w-[180px] border-primary-foreground/20 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
           >
-            <Link href="/shops">Browse Shops</Link>
+            <Link to="/shops">Browse Shops</Link>
           </Button>
         </div>
       </div>

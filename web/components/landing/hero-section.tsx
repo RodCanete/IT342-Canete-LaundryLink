@@ -1,4 +1,4 @@
-import Link from "next/link"
+import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Clock, Shield, Zap } from "lucide-react"
 
@@ -28,13 +28,13 @@ export function HeroSection() {
 
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button asChild size="lg" className="min-w-[180px] gap-2">
-              <Link href="/shops">
+              <Link to="/shops">
                 Book a Slot
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="min-w-[180px]">
-              <Link href="/#how-it-works">See How It Works</Link>
+              <Link to="/#how-it-works">See How It Works</Link>
             </Button>
           </div>
 

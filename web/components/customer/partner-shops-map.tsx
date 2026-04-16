@@ -1,6 +1,5 @@
-"use client"
 
-import Link from "next/link"
+import { Link } from "react-router-dom"
 import { useEffect, useRef, useState } from "react"
 import { Clock, MapPin } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
@@ -147,11 +146,11 @@ export function PartnerShopsMap({ shops, activeShopId, onSelectShop }: PartnerSh
       return
     }
 
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 
     if (!apiKey) {
       setStatus("error")
-      setErrorMessage("Add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to web/.env.local to display the map.")
+      setErrorMessage("Add VITE_GOOGLE_MAPS_API_KEY to web/.env.local to display the map.")
       return
     }
 
@@ -344,7 +343,7 @@ export function PartnerShopsMap({ shops, activeShopId, onSelectShop }: PartnerSh
                   className="m-4 mt-auto"
                   onClick={() => onSelectShop(shop.id)}
                 >
-                  <Link href={`/shops/${shop.id}`}>View Shop & Book</Link>
+                  <Link to={`/shops/${shop.id}`}>View Shop & Book</Link>
                 </Button>
               </div>
             )

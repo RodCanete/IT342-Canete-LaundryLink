@@ -1,6 +1,5 @@
-"use client"
 
-import Link from "next/link"
+import { Link } from "react-router-dom"
 import { useEffect, useMemo, useState } from "react"
 import { MapPin, Clock, Star, ArrowLeft, Zap, Users } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
