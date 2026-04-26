@@ -13,6 +13,7 @@ LAUNDRYLINK_SDD.md
 backend/.env
 web/.env
 mobile/local.properties
+.claude/
 
 ###################
 # JAVA/MAVEN (Backend)
