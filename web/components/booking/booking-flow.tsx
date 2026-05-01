@@ -316,7 +316,7 @@ export function BookingFlow({ shopId, preferredServiceId }: BookingFlowProps) {
     <section className="bg-background py-8 lg:py-12">
       <div className="mx-auto max-w-3xl px-4 lg:px-8">
         <Link
-          href={`/shops/${shopId}`}
+          to={`/shops/${shopId}`}
           className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />

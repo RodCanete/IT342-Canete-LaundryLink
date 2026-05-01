@@ -119,7 +119,7 @@ export function ShopDetailView({ shopId }: ShopDetailViewProps) {
     <section className="bg-background py-8 lg:py-12">
       <div className="mx-auto max-w-4xl px-4 lg:px-8">
         <Link
-          href="/customer/dashboard"
+          to="/customer/dashboard"
           className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -207,7 +207,7 @@ export function ShopDetailView({ shopId }: ShopDetailViewProps) {
                   ) : (
                     <Button asChild className="w-full">
                       <Link
-                        href={`/shops/${shop.id}/book?serviceId=${service.id}&type=${service.serviceType}`}
+                        to={`/shops/${shop.id}/book?serviceId=${service.id}&type=${service.serviceType}`}
                       >
                         {service.serviceType === "PRIORITY" ? "Book Priority Slot" : "Book Standard"}
                       </Link>

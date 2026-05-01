@@ -27,6 +27,8 @@ backend/.mvn/
 backend/mvnw
 backend/mvnw.cmd
 
+.superpowers\
+
 # Spring Boot
 backend/application-*.properties
 backend/application-*.yml

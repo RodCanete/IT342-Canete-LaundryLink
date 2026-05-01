@@ -31,7 +31,7 @@ export function DashboardGuard({ allowedRole, children }: DashboardGuardProps) {
     }
 
     setResolved(true)
-  }, [allowedRole, router])
+  }, [allowedRole, navigate])
 
   if (!resolved) {
     return <div className="min-h-screen bg-background" />
