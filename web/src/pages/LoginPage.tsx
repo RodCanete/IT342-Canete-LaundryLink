@@ -118,10 +118,12 @@ export default function LoginPage() {
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
               onError={() => {
-                setError("Google sign-in was cancelled or failed.")
+                setError(
+                  "Google sign-in failed. Make sure pop-ups are allowed and try again. If this keeps happening, use email/password login below."
+                )
                 toast({
                   title: "Google sign-in failed",
-                  description: "Please try again.",
+                  description: "Allow pop-ups and try again, or use email/password.",
                   variant: "destructive",
                 })
               }}

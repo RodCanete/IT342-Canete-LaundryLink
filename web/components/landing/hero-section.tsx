@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Timer, Shield, Star, WashingMachine, CheckCircle2 } from "lucide-react"
 import { Link } from "react-router-dom"
-import Silk from "./Silk"
 
 const stats = [
   { value: "500+", label: "Bookings Made" },
@@ -25,21 +24,13 @@ const trustPoints = [
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-screen overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
-
-      {/* ── Silk WebGL background ── */}
-      <div className="pointer-events-none absolute inset-0 z-0" style={{ opacity: 0.35 }} aria-hidden="true">
-        <Silk speed={5} scale={1} color="#5B6FEF" noiseIntensity={1.5} rotation={0} />
+    <section className="relative overflow-hidden bg-background pt-8">
+      <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
+        <div className="absolute -top-48 left-1/2 h-96 w-[800px] -translate-x-1/2 rounded-full bg-primary/5 blur-3xl" />
       </div>
 
-      {/* ── Bottom gradient fade ── */}
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-32 bg-gradient-to-b from-transparent to-background/60"
-        aria-hidden="true"
-      />
-
       {/* ── Main content ── */}
-      <div className="relative z-10 mx-auto max-w-7xl px-6 py-20 lg:flex lg:min-h-screen lg:items-center lg:px-12 lg:py-0">
+      <div className="relative z-10 mx-auto max-w-7xl px-6 py-12 lg:px-12 lg:py-20">
         <div className="grid w-full items-center gap-12 lg:grid-cols-[1fr_0.9fr] lg:gap-16">
 
           {/* ── Left column: text ── */}
