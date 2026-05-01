@@ -1,130 +1,180 @@
 "use client"
 
-import { MapPin, Clock, Star } from "lucide-react"
+import { useState } from "react"
+import { MapPin, Star, ArrowRight } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import { Link } from "react-router-dom"
 import { partnerShops } from "@/lib/partner-shops"
-import { ShopMap } from "@/components/maps/shop-map"
 
 const shopPhotos = [
-  "https://images.unsplash.com/photo-1545173168-9f1947eebb7f?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1517677208171-0bc6132cfc8c?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1604335398980-ededccc3a25a?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1545173168-9f1947eebb7f?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1517677208171-0bc6132cfc8c?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1604335398980-ededccc3a25a?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=800&q=80",
 ]
 
 export function ShopListSection() {
+  const [activeIdx, setActiveIdx] = useState(0)
+
+  const shop = partnerShops[activeIdx]
+  const priorityService = shop.services.find((s) => s.type === "PRIORITY") ?? shop.services[0]
+  const standardService = shop.services.find((s) => s.type === "STANDARD") ?? shop.services[0]
+  const slotsLeft = priorityService.slotsRemaining ?? 0
+
   return (
-    <section className="bg-card py-16 lg:py-24">
-      <div className="mx-auto max-w-7xl px-4 lg:px-8">
-        {/* Section header */}
-        <div className="mb-12 text-center">
-          <div className="mb-3 flex items-center justify-center gap-2 text-sm font-medium text-success">
-            {/* Live indicator */}
-            <span
-              className="inline-block h-2 w-2 rounded-full bg-success"
-              style={{ animation: "live-pulse 1.4s ease-in-out infinite" }}
+    <section className="bg-background py-20 lg:py-24">
+      <div className="mx-auto max-w-[1100px] px-6">
+
+        {/* Header */}
+        <div className="mb-9 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <div className="mb-2.5 flex items-center gap-2 text-xs font-semibold text-success">
+              <span
+                className="h-2 w-2 rounded-full bg-success"
+                style={{ animation: "live-pulse 1.4s ease-in-out infinite" }}
+              />
+              Live Availability
+            </div>
+            <h2 className="text-3xl font-extrabold tracking-[-0.02em] text-foreground">
+              Partner Laundry Shops
+            </h2>
+            <p className="mt-1.5 text-sm text-muted-foreground">
+              Trusted shops with real-time slot availability.
+            </p>
+          </div>
+          <Button asChild variant="outline" size="sm">
+            <Link to="/shops">
+              View All Shops
+              <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+            </Link>
+          </Button>
+        </div>
+
+        {/* Featured + side list */}
+        <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
+
+          {/* Large featured card */}
+          <Link
+            to={`/shops/${shop.id}`}
+            className="relative block overflow-hidden rounded-[20px] shadow-[0_8px_24px_rgba(0,0,0,0.12)] transition-transform duration-300 hover:scale-[1.005]"
+            style={{ height: 280 }}
+          >
+            <img
+              src={shopPhotos[activeIdx % shopPhotos.length]}
+              alt={shop.name}
+              className="h-full w-full object-cover transition-transform duration-500"
             />
-            Live Availability
-          </div>
-          <h2 className="text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            Partner Laundry Shops
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-pretty text-muted-foreground">
-            Browse our curated list of trusted laundry shops. Select one to view services
-            and book your priority slot.
-          </p>
-        </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
 
-        {/* Google Map */}
-        <div className="mb-10 overflow-hidden rounded-xl border border-border bg-muted/40 p-4 lg:p-6">
-          <div className="h-64 overflow-hidden rounded-lg sm:h-80">
-            <ShopMap />
-          </div>
-        </div>
+            {/* Info overlay */}
+            <div className="absolute bottom-[18px] left-[18px] right-[18px]">
+              <div className="flex items-end justify-between">
+                <div>
+                  <p className="text-[17px] font-bold text-white">{shop.name}</p>
+                  <div className="mt-1 flex items-center gap-1 text-xs text-white/80">
+                    <MapPin className="h-2.5 w-2.5" />
+                    {shop.address}
+                  </div>
+                </div>
+                <div>
+                  <div className="mb-1.5 flex justify-end gap-1.5">
+                    <span className="rounded-[6px] border border-white/20 bg-white/[0.18] px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
+                      PHP {standardService.price} std
+                    </span>
+                    <span className="rounded-[6px] bg-primary px-2.5 py-1 text-[11px] font-bold text-white">
+                      PHP {priorityService.price} priority
+                    </span>
+                  </div>
+                  <div className="flex justify-end">
+                    <Badge
+                      className={
+                        slotsLeft === 0 || slotsLeft <= 3
+                          ? "bg-destructive text-[10px] text-destructive-foreground"
+                          : "bg-success text-[10px] text-success-foreground"
+                      }
+                    >
+                      {slotsLeft === 0 ? "Full today" : `${slotsLeft} slots left`}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-        {/* Shop cards */}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-          {partnerShops.map((shop, i) => {
-            const standardService =
-              shop.services.find((s) => s.type === "STANDARD") ?? shop.services[0]
-            const priorityService =
-              shop.services.find((s) => s.type === "PRIORITY") ?? shop.services[0]
-            const lowSlots = (priorityService.slotsRemaining ?? 0) <= 2
+            {/* Dot navigation */}
+            <div className="absolute left-[18px] top-[14px] flex gap-1.5">
+              {partnerShops.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    setActiveIdx(i)
+                  }}
+                  style={{
+                    width: i === activeIdx ? 20 : 7,
+                    height: 7,
+                    borderRadius: 9999,
+                    background: "white",
+                    opacity: i === activeIdx ? 1 : 0.45,
+                    border: "none",
+                    cursor: "pointer",
+                    padding: 0,
+                    transition: "all 0.25s",
+                    flexShrink: 0,
+                  }}
+                  aria-label={`Show shop ${i + 1}`}
+                />
+              ))}
+            </div>
+          </Link>
 
-            return (
-              <Card
-                key={shop.id}
-                className="group overflow-hidden border-border transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl"
-                style={{ animation: "fade-in-up 0.5s ease-out both", animationDelay: `${i * 0.07}s` }}
+          {/* Side list */}
+          <div className="flex flex-col gap-2.5">
+            {partnerShops.map((s, i) => (
+              <button
+                key={s.id}
+                onClick={() => setActiveIdx(i)}
+                className={`flex items-center gap-3 rounded-xl border px-3.5 py-2.5 text-left transition-all duration-150 ${
+                  i === activeIdx
+                    ? "border-primary bg-primary/[0.06]"
+                    : "border-border bg-card hover:border-primary/30 hover:bg-secondary/40"
+                }`}
               >
-                {/* Card image area — real laundry photo */}
-                <div className="relative h-40 overflow-hidden">
+                <div className="h-[42px] w-[42px] shrink-0 overflow-hidden rounded-[10px]">
                   <img
                     src={shopPhotos[i % shopPhotos.length]}
-                    alt={shop.name}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    alt={s.name}
+                    className="h-full w-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
-
-                  {/* Urgency badge with pulsing dot */}
-                  {lowSlots && (
-                    <Badge className="absolute right-3 top-3 flex items-center gap-1.5 bg-destructive text-destructive-foreground">
-                      <span
-                        className="inline-block h-1.5 w-1.5 rounded-full bg-destructive-foreground"
-                        style={{ animation: "live-pulse 1s ease-in-out infinite" }}
-                      />
-                      {(priorityService.slotsRemaining ?? 0) === 1
-                        ? "1 Slot Left"
-                        : `${priorityService.slotsRemaining ?? 0} Slots Left`}
-                    </Badge>
-                  )}
                 </div>
+                <div className="min-w-0 flex-1">
+                  <p
+                    className={`truncate text-[13px] font-semibold ${
+                      i === activeIdx ? "text-primary" : "text-foreground"
+                    }`}
+                  >
+                    {s.name}
+                  </p>
+                  <p className="mt-0.5 text-[11px] text-muted-foreground">{s.hours}</p>
+                </div>
+                <div className="flex shrink-0 items-center gap-1">
+                  <Star className="h-[10px] w-[10px] fill-warning text-warning" />
+                  <span className="text-[11px] font-bold text-foreground">{s.rating}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
 
-                <CardContent className="flex flex-col gap-3 p-5">
-                  <div>
-                    <h3 className="text-base font-semibold text-foreground transition-colors group-hover:text-primary">
-                      {shop.name}
-                    </h3>
-                    <div className="mt-1.5 flex items-center gap-1 text-xs text-muted-foreground">
-                      <MapPin className="h-3 w-3 shrink-0" />
-                      {shop.address}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Clock className="h-3 w-3" />
-                      {shop.hours}
-                    </div>
-                    <div className="flex items-center gap-1 text-xs font-medium text-foreground">
-                      <Star className="h-3 w-3 fill-warning text-warning" />
-                      {shop.rating}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 rounded-xl bg-secondary/60 p-2.5 text-xs">
-                    <div className="flex-1 text-center">
-                      <span className="block text-muted-foreground">Standard</span>
-                      <span className="font-semibold text-foreground">PHP {standardService.price}</span>
-                    </div>
-                    <div className="h-6 w-px bg-border" />
-                    <div className="flex-1 text-center">
-                      <span className="block font-medium text-primary">Priority</span>
-                      <span className="font-semibold text-foreground">PHP {priorityService.price}</span>
-                    </div>
-                  </div>
-
-                  <Button asChild size="sm" className="w-full">
-                    <Link to={`/shops/${shop.id}`}>Book Now</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            )
-          })}
+        {/* Browse CTA */}
+        <div className="mt-8 text-center">
+          <Button asChild size="lg" className="gap-2">
+            <Link to="/shops">
+              Browse All Shops
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
         </div>
       </div>
     </section>
