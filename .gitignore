@@ -14,6 +14,7 @@ backend/.env
 web/.env
 mobile/local.properties
 .claude/
+.superpowers/
 
 ###################
 # JAVA/MAVEN (Backend)
@@ -27,7 +28,6 @@ backend/.mvn/
 backend/mvnw
 backend/mvnw.cmd
 
-.superpowers\
 
 # Spring Boot
 backend/application-*.properties
