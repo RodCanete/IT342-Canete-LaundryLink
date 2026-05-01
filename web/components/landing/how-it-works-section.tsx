@@ -33,51 +33,59 @@ export function HowItWorksSection() {
   return (
     <section
       id="how-it-works"
-      className="bg-gradient-to-b from-background via-secondary/30 to-background py-16 lg:py-24"
+      className="bg-card py-20 lg:py-24"
     >
-      <div className="mx-auto max-w-7xl px-4 lg:px-8">
+      <div className="mx-auto max-w-[1100px] px-6">
         {/* Section header */}
         <div className="mb-14 text-center">
-          <div className="mb-3 inline-flex items-center gap-1.5 text-sm font-medium text-accent">
-            <span className="text-base">💧</span>
+          <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/[0.08] px-3.5 py-1.5 text-xs font-semibold text-primary">
             Simple process
           </div>
-          <h2 className="text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+          <h2 className="text-balance text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
             How It Works
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-pretty text-muted-foreground">
-            Book your laundry slot in four simple steps. No more unpredictable wait times.
+          <p className="mx-auto mt-4 max-w-[460px] text-pretty text-muted-foreground">
+            Four steps to fresh laundry without the wait.
           </p>
         </div>
 
         {/* Steps */}
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="relative grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((step, i) => (
             <div
               key={step.title}
-              className="group relative flex flex-col items-center text-center"
-              style={{ animation: "fade-in-up 0.55s ease-out both", animationDelay: `${i * 0.1}s` }}
+              className="group relative z-10 flex flex-col items-center text-center"
+              style={{ animation: `fade-in-up 0.55s ease-out ${i * 0.1}s both` }}
             >
-              {/* Gradient connecting line */}
+              {/* Connector: starts at right edge of this icon, ends at left edge of next icon */}
               {i < steps.length - 1 && (
-                <div className="absolute left-[calc(50%+36px)] top-8 hidden h-px w-[calc(100%-72px)] bg-gradient-to-r from-primary/30 to-accent/30 lg:block" />
+                <div
+                  className="absolute top-8 hidden h-px bg-gradient-to-r from-primary/25 to-accent/25 lg:block"
+                  style={{ left: "calc(50% + 32px)", right: "-50%" }}
+                />
               )}
 
               {/* Icon */}
               <div
-                className="relative z-10 mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 transition-transform duration-300 group-hover:scale-110"
+                className={`relative mb-5 flex h-16 w-16 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-110 ${
+                  i === 0
+                    ? "bg-primary shadow-[0_8px_20px_oklch(0.536_0.234_264/0.35)]"
+                    : "bg-primary/10"
+                }`}
                 style={{
                   animation: "pulse-glow 3.5s ease-in-out infinite",
                   animationDelay: `${i * 0.4}s`,
                 }}
               >
-                <step.icon className="h-7 w-7 text-primary" />
+                <step.icon
+                  className={`h-7 w-7 ${i === 0 ? "text-primary-foreground" : "text-primary"}`}
+                />
                 <span className="absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground shadow-sm">
                   {i + 1}
                 </span>
               </div>
 
-              <h3 className="mb-2 text-lg font-semibold text-foreground">{step.title}</h3>
+              <h3 className="mb-2 text-[15px] font-bold text-foreground">{step.title}</h3>
               <p className="text-sm leading-relaxed text-muted-foreground">{step.description}</p>
             </div>
           ))}
