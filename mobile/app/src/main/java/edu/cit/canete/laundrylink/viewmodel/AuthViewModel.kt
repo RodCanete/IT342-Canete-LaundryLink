@@ -36,6 +36,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                     tokenManager.saveToken(token)
                     if (user != null) {
                         tokenManager.saveUser(
+                            id    = user.id,
                             email = user.email,
                             name  = "${user.firstName} ${user.lastName}",
                             role  = user.role
@@ -61,6 +62,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                     tokenManager.saveToken(token)
                     if (user != null) {
                         tokenManager.saveUser(
+                            id    = user.id,
                             email = user.email,
                             name  = "${user.firstName} ${user.lastName}",
                             role  = user.role
