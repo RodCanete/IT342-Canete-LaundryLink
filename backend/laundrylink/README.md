@@ -20,6 +20,8 @@
    DATABASE_USERNAME=postgres
    DATABASE_PASSWORD=YOUR_ACTUAL_PASSWORD
    JWT_SECRET=YourUniqueSecretKey32CharactersMinimum
+  GOOGLE_CLIENT_ID=your_google_web_client_id
+  GOOGLE_CLIENT_SECRET=your_google_client_secret
    PAYMONGO_SECRET_KEY=sk_test_xxx
    PAYMONGO_REQUIRE_TEST_KEY=true
    PAYMONGO_WEBHOOK_SECRET=whsec_xxx
@@ -182,6 +184,12 @@ server.port=8081
 ### JWT errors
 - Ensure `JWT_SECRET` is at least 32 characters
 - Verify the secret matches between requests
+
+### Google login shows `Error 400: origin_mismatch`
+- In Google Cloud Console, open your OAuth Web Client and add `http://localhost:3000` to **Authorized JavaScript origins**.
+- If you run frontend on Vite default fallback, also add `http://localhost:5173`.
+- Ensure `GOOGLE_CLIENT_ID` in backend `.env` exactly matches `VITE_GOOGLE_CLIENT_ID` in `web/.env.local`.
+- Restart both services after updating env values.
 
 ## Security Notes
 

@@ -9,6 +9,11 @@ export function GoogleOAuthProvider({ children }: Props) {
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
 
   if (!clientId) {
+    if (import.meta.env.DEV) {
+      console.warn(
+        'Google OAuth is disabled: VITE_GOOGLE_CLIENT_ID is missing in web/.env.local.'
+      )
+    }
     return children
   }
 

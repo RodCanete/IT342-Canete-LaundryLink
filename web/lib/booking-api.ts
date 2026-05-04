@@ -83,6 +83,7 @@ export type CreateBookingPayload = {
   serviceId: string
   date: string
   timeSlot: string
+  fileUrl?: string | null
 }
 
 export type CreatePaymentIntentPayload = {

@@ -28,6 +28,7 @@ backend/.mvn/
 backend/mvnw
 backend/mvnw.cmd
 
+md_Files/
 
 # Spring Boot
 backend/application-*.properties

@@ -1,6 +1,7 @@
 package edu.cit.canete.laundrylink.dto;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -19,6 +20,9 @@ public class CreateBookingRequest {
 
     @NotNull
     private LocalTime timeSlot;
+
+    @Size(max = 1024)
+    private String fileUrl;
 
     public UUID getShopId() {
         return shopId;
@@ -50,5 +54,13 @@ public class CreateBookingRequest {
 
     public void setTimeSlot(LocalTime timeSlot) {
         this.timeSlot = timeSlot;
+    }
+
+    public String getFileUrl() {
+        return fileUrl;
+    }
+
+    public void setFileUrl(String fileUrl) {
+        this.fileUrl = fileUrl;
     }
 }

@@ -21,6 +21,7 @@ import {
   Settings2,
   ShieldCheck,
   BookOpen,
+  type LucideIcon,
 } from "lucide-react"
 import { getCurrentUser, getDashboardPath, logout, type User as AuthUser } from "@/lib/auth"
 
@@ -28,7 +29,7 @@ function getInitials(user: AuthUser): string {
   return ((user.firstName?.[0] ?? "") + (user.lastName?.[0] ?? "")).toUpperCase()
 }
 
-type NavLink = { label: string; href: string; icon?: React.ElementType }
+type NavLink = { label: string; href: string; icon?: LucideIcon }
 
 const publicLinks: NavLink[] = [
   { label: "Find Shops", href: "/shops", icon: BookOpen },
@@ -109,16 +110,19 @@ export function Navbar() {
 
         {/* ── Desktop nav links ── */}
         <nav className="hidden items-center gap-0.5 md:flex">
-          {navigationLinks.map((link) => (
-            <Link
-              key={link.href}
-              to={link.href}
-              className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
-            >
-              {link.icon && <link.icon className="h-3.5 w-3.5" />}
-              {link.label}
-            </Link>
-          ))}
+          {navigationLinks.map((item: NavLink) => {
+            const Icon = item.icon
+            return (
+              <Link
+                key={item.href}
+                to={item.href}
+                className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
+              >
+                {Icon ? <Icon className="h-3.5 w-3.5" /> : null}
+                {item.label}
+              </Link>
+            )
+          })}
         </nav>
 
         {/* ── Desktop right side ── */}
@@ -241,17 +245,20 @@ export function Navbar() {
 
               {/* Nav links */}
               <nav className="flex flex-col gap-1">
-                {navigationLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    to={link.href}
-                    onClick={() => setOpen(false)}
-                    className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
-                  >
-                    {link.icon && <link.icon className="h-4 w-4" />}
-                    {link.label}
-                  </Link>
-                ))}
+                {navigationLinks.map((item: NavLink) => {
+                  const Icon = item.icon
+                  return (
+                    <Link
+                      key={item.href}
+                      to={item.href}
+                      onClick={() => setOpen(false)}
+                      className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
+                    >
+                      {Icon ? <Icon className="h-4 w-4" /> : null}
+                      {item.label}
+                    </Link>
+                  )
+                })}
               </nav>
 
               {/* Auth actions */}
