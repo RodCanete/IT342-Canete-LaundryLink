@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import edu.cit.canete.laundrylink.R
 import edu.cit.canete.laundrylink.databinding.FragmentMyBookingsBinding
 import edu.cit.canete.laundrylink.ui.adapter.BookingAdapter
 import edu.cit.canete.laundrylink.viewmodel.MyBookingsViewModel
@@ -36,9 +37,8 @@ class MyBookingsFragment : Fragment() {
         binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
 
         adapter = BookingAdapter { booking ->
-            // Navigation to confirmation — wired in Task 12
-            parentFragmentManager.setFragmentResult(
-                "navigate_to_confirmation",
+            findNavController().navigate(
+                R.id.action_myBookings_to_confirmation,
                 bundleOf("bookingId" to booking.id)
             )
         }

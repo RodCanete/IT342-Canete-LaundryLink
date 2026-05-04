@@ -15,6 +15,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import edu.cit.canete.laundrylink.R
 import edu.cit.canete.laundrylink.databinding.FragmentBookingFlowBinding
 import edu.cit.canete.laundrylink.ui.adapter.SlotAdapter
 import edu.cit.canete.laundrylink.viewmodel.BookingViewModel
@@ -107,11 +108,11 @@ class BookingFlowFragment : Fragment() {
                 binding.tvBookingError.isVisible = state.error != null
                 binding.tvBookingError.text = state.error ?: ""
 
-                // Navigate to confirmation on booking created
+                // Navigate to confirmation on booking created (one-shot)
                 state.createdBooking?.let { booking ->
-                    // Navigation wired in Task 12
-                    parentFragmentManager.setFragmentResult(
-                        "navigate_to_confirmation",
+                    viewModel.onNavigatedToConfirmation()
+                    findNavController().navigate(
+                        R.id.action_bookingFlow_to_confirmation,
                         bundleOf("bookingId" to booking.id)
                     )
                 }

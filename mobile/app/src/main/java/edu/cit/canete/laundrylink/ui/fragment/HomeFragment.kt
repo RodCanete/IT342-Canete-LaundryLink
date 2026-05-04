@@ -6,10 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import edu.cit.canete.laundrylink.R
 import edu.cit.canete.laundrylink.databinding.FragmentHomeBinding
+import edu.cit.canete.laundrylink.storage.TokenManager
 import edu.cit.canete.laundrylink.viewmodel.AuthViewModel
+import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
 
@@ -28,6 +31,7 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val tokenManager = TokenManager(requireContext())
 
         binding.toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
@@ -40,12 +44,18 @@ class HomeFragment : Fragment() {
             }
         }
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            tokenManager.getUserName().collect { name ->
+                if (!name.isNullOrBlank()) binding.tvWelcome.text = "Hello, $name!"
+            }
+        }
+
         binding.btnBookNow.setOnClickListener {
-            // TODO: Navigate to shops in next phase.
+            findNavController().navigate(R.id.action_home_to_shopList)
         }
 
         binding.btnMyBookings.setOnClickListener {
-            // TODO: Navigate to bookings in next phase.
+            findNavController().navigate(R.id.action_home_to_myBookings)
         }
     }
 

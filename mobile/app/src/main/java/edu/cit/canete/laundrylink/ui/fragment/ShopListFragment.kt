@@ -6,11 +6,14 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import edu.cit.canete.laundrylink.R
 import edu.cit.canete.laundrylink.databinding.FragmentShopListBinding
 import edu.cit.canete.laundrylink.ui.adapter.ShopAdapter
 import edu.cit.canete.laundrylink.viewmodel.ShopListState
@@ -35,9 +38,10 @@ class ShopListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         adapter = ShopAdapter { shop ->
-            // Navigation wired in Task 12 when nav graph is updated
-            val bundle = Bundle().apply { putString("shopId", shop.id) }
-            parentFragmentManager.setFragmentResult("navigate_to_shop", bundle)
+            findNavController().navigate(
+                R.id.action_shopList_to_shopDetail,
+                bundleOf("shopId" to shop.id)
+            )
         }
 
         binding.rvShops.layoutManager = LinearLayoutManager(requireContext())

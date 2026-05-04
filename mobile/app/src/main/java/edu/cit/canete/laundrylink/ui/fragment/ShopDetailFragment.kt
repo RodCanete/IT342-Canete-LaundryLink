@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.button.MaterialButton
+import edu.cit.canete.laundrylink.R
 import edu.cit.canete.laundrylink.databinding.FragmentShopDetailBinding
 import edu.cit.canete.laundrylink.network.model.Service
 import edu.cit.canete.laundrylink.viewmodel.ShopDetailViewModel
@@ -65,9 +66,8 @@ class ShopDetailFragment : Fragment() {
         val btn = MaterialButton(requireContext()).apply {
             text = "${service.name}  —  ₱%.0f".format(service.price)
             setOnClickListener {
-                // Navigation to BookingFlow — wired in Task 12
-                parentFragmentManager.setFragmentResult(
-                    "navigate_to_booking",
+                findNavController().navigate(
+                    R.id.action_shopDetail_to_bookingFlow,
                     bundleOf("shopId" to shopId, "serviceId" to service.id)
                 )
             }

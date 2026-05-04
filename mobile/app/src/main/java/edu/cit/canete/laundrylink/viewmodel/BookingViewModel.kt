@@ -80,6 +80,10 @@ class BookingViewModel : ViewModel() {
         _state.value = _state.value.copy(fileUrl = url)
     }
 
+    fun onNavigatedToConfirmation() {
+        _state.value = _state.value.copy(createdBooking = null)
+    }
+
     fun submitBooking() {
         val s = _state.value
         val slot = s.selectedSlot ?: return

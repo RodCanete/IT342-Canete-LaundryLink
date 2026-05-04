@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import edu.cit.canete.laundrylink.R
 import edu.cit.canete.laundrylink.databinding.FragmentBookingConfirmationBinding
 import edu.cit.canete.laundrylink.viewmodel.BookingConfirmationViewModel
 import kotlinx.coroutines.launch
@@ -41,8 +42,7 @@ class BookingConfirmationFragment : Fragment() {
         viewModel.pollPaymentStatus(bookingId)
 
         binding.btnMyBookings.setOnClickListener {
-            // Navigation wired in Task 12
-            findNavController().navigateUp()
+            findNavController().navigate(R.id.action_confirmation_to_myBookings)
         }
 
         binding.btnPay.setOnClickListener {
