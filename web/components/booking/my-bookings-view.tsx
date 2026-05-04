@@ -28,7 +28,7 @@ type BookingView = {
   time: string
   status: BookingStatus
   amount: number
-  fileAttached: boolean
+  fileUrl: string | null
 }
 
 const statusConfig: Record<BookingStatus, { color: string; bg: string }> = {
@@ -90,7 +90,7 @@ export function MyBookingsView() {
               time: formatBackendTime(booking.timeSlot),
               status: mapStatus(booking.status),
               amount: serviceInfo?.price || 0,
-              fileAttached: !!booking.fileUrl,
+              fileUrl: booking.fileUrl,
             }
           })
 
@@ -211,11 +211,17 @@ export function MyBookingsView() {
                         </div>
 
                         <div className="flex items-center gap-2">
-                          {booking.fileAttached && (
-                            <Button variant="ghost" size="icon" className="h-9 w-9" title="View attached file">
+                          {booking.fileUrl && (
+                            <a
+                              href={booking.fileUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title="View attached file"
+                              className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground"
+                            >
                               <FileText className="h-4 w-4" />
                               <span className="sr-only">View attached file</span>
-                            </Button>
+                            </a>
                           )}
                           {booking.status !== "Pending Payment" && (
                             <Dialog>

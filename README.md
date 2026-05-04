@@ -224,16 +224,33 @@ cd web
 npm install
 
 # Create environment file
-cp .env.example .env
-# Edit .env:
-# REACT_APP_API_URL=http://localhost:8080/api/v1
-# REACT_APP_GOOGLE_MAPS_KEY=your_google_maps_key
+cp .env.example .env.local
+# Edit .env.local:
+# VITE_API_URL=http://localhost:8080/api
+# VITE_GOOGLE_CLIENT_ID=<your_google_web_client_id>
+# VITE_GOOGLE_MAPS_API_KEY=<your_google_maps_key>
 
 # Start development server
-npm start
+npm run dev
 
 # Web app runs on http://localhost:3000
 ```
+
+### Google OAuth Setup (Fix Error 400 origin_mismatch)
+
+If Google login/register shows `Error 400: origin_mismatch`, configure your OAuth client as follows:
+
+1. Open Google Cloud Console → APIs & Services → Credentials.
+2. Select your OAuth 2.0 Client ID (type: Web application).
+3. Under **Authorized JavaScript origins**, add:
+   - `http://localhost:3000`
+   - `http://localhost:5173` (optional fallback)
+4. Save changes, then restart frontend and backend.
+5. Ensure these values match exactly:
+   - `web/.env.local` → `VITE_GOOGLE_CLIENT_ID`
+   - `backend/laundrylink/.env` → `GOOGLE_CLIENT_ID`
+
+The backend verifies Google token audience against `GOOGLE_CLIENT_ID`, so mismatched IDs will still fail even after origin fixes.
 
 #### 4. Mobile Application Setup (Kotlin)
 

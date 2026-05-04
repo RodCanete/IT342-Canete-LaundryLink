@@ -8,12 +8,16 @@ import { Link } from "react-router-dom"
 import { partnerShops } from "@/lib/partner-shops"
 
 const shopPhotos = [
+  "https://images.unsplash.com/photo-1582735689369-4fe89db7114c?auto=format&fit=crop&w=800&q=80",
   "https://images.unsplash.com/photo-1545173168-9f1947eebb7f?auto=format&fit=crop&w=800&q=80",
-  "https://images.unsplash.com/photo-1517677208171-0bc6132cfc8c?auto=format&fit=crop&w=800&q=80",
-  "https://images.unsplash.com/photo-1604335398980-ededccc3a25a?auto=format&fit=crop&w=800&q=80",
-  "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&w=800&q=80",
-  "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1610557892470-55d9e80c0bce?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?auto=format&fit=crop&w=800&q=80",
 ]
+
+const handleImgError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+  e.currentTarget.src = "/placeholder.jpg"
+}
 
 export function ShopListSection() {
   const [activeIdx, setActiveIdx] = useState(0)
@@ -65,6 +69,7 @@ export function ShopListSection() {
               src={shopPhotos[activeIdx % shopPhotos.length]}
               alt={shop.name}
               className="h-full w-full object-cover transition-transform duration-500"
+              onError={handleImgError}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
 
@@ -146,6 +151,7 @@ export function ShopListSection() {
                     src={shopPhotos[i % shopPhotos.length]}
                     alt={s.name}
                     className="h-full w-full object-cover"
+                    onError={handleImgError}
                   />
                 </div>
                 <div className="min-w-0 flex-1">

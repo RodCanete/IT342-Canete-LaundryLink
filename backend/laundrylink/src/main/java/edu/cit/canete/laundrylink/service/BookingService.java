@@ -72,6 +72,10 @@ public class BookingService {
         booking.setStatus(BookingStatus.PENDING_PAYMENT);
         booking.setBookingCode(generateBookingCode());
 
+        if (request.getFileUrl() != null && !request.getFileUrl().isBlank()) {
+            booking.setFileUrl(request.getFileUrl().trim());
+        }
+
         Booking saved = bookingRepository.save(booking);
         return toBookingMap(saved);
     }

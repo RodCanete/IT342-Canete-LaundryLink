@@ -1,7 +1,7 @@
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, type ChangeEvent } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { ArrowLeft, ArrowRight, Calendar, Clock, Upload, FileText, CheckCircle2, X } from "lucide-react"
+import { ArrowLeft, ArrowRight, Calendar, Clock, Upload, FileText, CheckCircle2, X, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -20,6 +20,8 @@ import {
   type ShopApi,
   type SlotApi,
 } from "@/lib/booking-api"
+import { uploadAttachment, validateAttachment } from "@/lib/attachments"
+import { getCurrentUser } from "@/lib/auth"
 
 const steps = [
   { label: "Date", icon: Calendar },
@@ -38,7 +40,10 @@ export function BookingFlow({ shopId, preferredServiceId }: BookingFlowProps) {
   const [currentStep, setCurrentStep] = useState(0)
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
   const [selectedTime, setSelectedTime] = useState<string | null>(null)
-  const [uploadedFile, setUploadedFile] = useState<string | null>(null)
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
+  const [uploadedFileUrl, setUploadedFileUrl] = useState<string | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
   const [shop, setShop] = useState<ShopApi | null>(null)
   const [services, setServices] = useState<ServiceApi[]>([])
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(preferredServiceId ?? null)
@@ -231,7 +236,49 @@ export function BookingFlow({ shopId, preferredServiceId }: BookingFlowProps) {
       return !!selectedTime
     }
 
+    if (currentStep === 2) {
+      return !isUploading
+    }
+
     return true
+  }
+
+  async function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ""
+    if (!file) return
+
+    const validation = validateAttachment(file)
+    if (validation) {
+      setUploadError(validation)
+      return
+    }
+
+    const user = getCurrentUser()
+    if (!user) {
+      setUploadError("You must be signed in to upload a file.")
+      return
+    }
+
+    setIsUploading(true)
+    setUploadError(null)
+    try {
+      const { publicUrl } = await uploadAttachment(file, user.id)
+      setUploadedFileName(file.name)
+      setUploadedFileUrl(publicUrl)
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Upload failed")
+      setUploadedFileName(null)
+      setUploadedFileUrl(null)
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
+  function clearUploadedFile() {
+    setUploadedFileName(null)
+    setUploadedFileUrl(null)
+    setUploadError(null)
   }
 
   async function handleSubmitBooking() {
@@ -252,6 +299,7 @@ export function BookingFlow({ shopId, preferredServiceId }: BookingFlowProps) {
         serviceId: activeService.id,
         date: toIsoDateOnly(activeDate),
         timeSlot: activeTime,
+        fileUrl: uploadedFileUrl ?? undefined,
       })
 
       try {
@@ -475,24 +523,29 @@ export function BookingFlow({ shopId, preferredServiceId }: BookingFlowProps) {
                     Optional: attach a laundry photo or special instruction file
                   </p>
                 </div>
-                {!uploadedFile ? (
-                  <label className="group flex cursor-pointer flex-col items-center gap-4 rounded-xl border-2 border-dashed border-border bg-muted/30 p-10 transition-colors hover:border-primary/40 hover:bg-primary/5">
+                {!uploadedFileUrl ? (
+                  <label className={`group flex flex-col items-center gap-4 rounded-xl border-2 border-dashed border-border bg-muted/30 p-10 transition-colors ${isUploading ? "cursor-wait opacity-70" : "cursor-pointer hover:border-primary/40 hover:bg-primary/5"}`}>
                     <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
-                      <Upload className="h-6 w-6 text-primary" />
+                      {isUploading ? (
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                      ) : (
+                        <Upload className="h-6 w-6 text-primary" />
+                      )}
                     </div>
                     <div className="text-center">
                       <p className="text-sm font-medium text-foreground">
-                        Click to upload or drag and drop
+                        {isUploading ? "Uploading..." : "Click to upload or drag and drop"}
                       </p>
                       <p className="mt-1 text-xs text-muted-foreground">
-                        Image or PDF, max 10MB
+                        PDF, JPG, or PNG, max 5MB
                       </p>
                     </div>
                     <input
                       type="file"
-                      accept="image/*,.pdf"
+                      accept="application/pdf,image/jpeg,image/png"
                       className="hidden"
-                      onChange={() => setUploadedFile("laundry-instructions.pdf")}
+                      disabled={isUploading}
+                      onChange={handleFileChange}
                     />
                   </label>
                 ) : (
@@ -501,17 +554,20 @@ export function BookingFlow({ shopId, preferredServiceId }: BookingFlowProps) {
                       <FileText className="h-5 w-5 text-primary" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-foreground">{uploadedFile}</p>
-                      <p className="text-xs text-muted-foreground">PDF document</p>
+                      <p className="text-sm font-medium text-foreground">{uploadedFileName ?? "Attachment"}</p>
+                      <p className="text-xs text-muted-foreground">Uploaded</p>
                     </div>
                     <button
-                      onClick={() => setUploadedFile(null)}
+                      onClick={clearUploadedFile}
                       className="rounded-md p-1 text-muted-foreground hover:bg-secondary hover:text-foreground"
                     >
                       <X className="h-4 w-4" />
                       <span className="sr-only">Remove file</span>
                     </button>
                   </div>
+                )}
+                {uploadError && (
+                  <p className="text-sm text-destructive">{uploadError}</p>
                 )}
               </div>
             )}
@@ -554,7 +610,7 @@ export function BookingFlow({ shopId, preferredServiceId }: BookingFlowProps) {
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">File Attached</span>
                       <span className="font-medium text-foreground">
-                        {uploadedFile || "None"}
+                        {uploadedFileName || "None"}
                       </span>
                     </div>
                     <Separator />
