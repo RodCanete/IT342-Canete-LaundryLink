@@ -72,15 +72,18 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnBookNow"
                     android:layout_width="0dp"
-                    android:layout_height="80dp"
+                    android:layout_height="56dp"
                     android:layout_weight="1"
-                    android:text="Book Now"
+                    android:text="BOOK NOW"
                     android:backgroundTint="#3B82F6"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
                     app:cornerRadius="12dp"/>
 
                 <Space
@@ -90,10 +93,12 @@
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnMyBookings"
                     android:layout_width="0dp"
-                    android:layout_height="80dp"
+                    android:layout_height="56dp"
                     android:layout_weight="1"
-                    android:text="My Bookings"
+                    android:text="MY BOOKINGS"
                     android:backgroundTint="#0EA5E9"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
                     app:cornerRadius="12dp"/>
 
             </LinearLayout>
@@ -108,86 +113,27 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="12dp"/>
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
+            <ProgressBar
+                android:id="@+id/nearbyShopsLoading"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                android:layout_marginBottom="12dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="16dp"
-                    android:gravity="center_vertical">
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Shop 1\nCebu City • 0.2 km away"
-                        android:textColor="#1F2937"/>
-                    <com.google.android.material.button.MaterialButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Book"
-                        android:backgroundTint="#1E40AF"
-                        app:cornerRadius="8dp"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                android:layout_gravity="center_horizontal"
+                android:visibility="gone"/>
 
-            <com.google.android.material.card.MaterialCardView
+            <TextView
+                android:id="@+id/nearbyShopsError"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                android:layout_marginBottom="12dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="16dp"
-                    android:gravity="center_vertical">
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Shop 2\nCebu City • 0.5 km away"
-                        android:textColor="#1F2937"/>
-                    <com.google.android.material.button.MaterialButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Book"
-                        android:backgroundTint="#1E40AF"
-                        app:cornerRadius="8dp"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                android:textColor="#DC2626"
+                android:textSize="14sp"
+                android:visibility="gone"
+                android:padding="16dp"/>
 
-            <com.google.android.material.card.MaterialCardView
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvNearbyShops"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                android:layout_marginBottom="12dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="16dp"
-                    android:gravity="center_vertical">
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Shop 3\nCebu City • 0.8 km away"
-                        android:textColor="#1F2937"/>
-                    <com.google.android.material.button.MaterialButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Book"
-                        android:backgroundTint="#1E40AF"
-                        app:cornerRadius="8dp"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                android:nestedScrollingEnabled="false"/>
 
         </LinearLayout>
     </ScrollView>
