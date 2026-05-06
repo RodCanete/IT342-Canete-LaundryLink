@@ -1,44 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<navigation
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
     app:startDestination="@id/loginFragment">
 
-    <fragment
-        android:id="@+id/loginFragment"
+    <fragment android:id="@+id/loginFragment"
         android:name="edu.cit.canete.laundrylink.ui.fragment.LoginFragment"
         android:label="Login">
-        <action
-            android:id="@+id/action_login_to_register"
-            app:destination="@id/registerFragment"/>
-        <action
-            android:id="@+id/action_login_to_home"
-            app:destination="@id/homeFragment"
-            app:popUpTo="@id/loginFragment"
-            app:popUpToInclusive="true"/>
+        <action android:id="@+id/action_login_to_register" app:destination="@id/registerFragment"/>
+        <action android:id="@+id/action_login_to_home" app:destination="@id/homeFragment"
+            app:popUpTo="@id/loginFragment" app:popUpToInclusive="true"/>
     </fragment>
 
-    <fragment
-        android:id="@+id/registerFragment"
+    <fragment android:id="@+id/registerFragment"
         android:name="edu.cit.canete.laundrylink.ui.fragment.RegisterFragment"
         android:label="Register">
-        <action
-            android:id="@+id/action_register_to_login"
-            app:destination="@id/loginFragment"
-            app:popUpTo="@id/registerFragment"
-            app:popUpToInclusive="true"/>
+        <action android:id="@+id/action_register_to_login" app:destination="@id/loginFragment"
+            app:popUpTo="@id/registerFragment" app:popUpToInclusive="true"/>
     </fragment>
 
-    <fragment
-        android:id="@+id/homeFragment"
+    <fragment android:id="@+id/homeFragment"
         android:name="edu.cit.canete.laundrylink.ui.fragment.HomeFragment"
         android:label="Home">
-        <action
-            android:id="@+id/action_home_to_login"
-            app:destination="@id/loginFragment"
-            app:popUpTo="@id/homeFragment"
-            app:popUpToInclusive="true"/>
+        <action android:id="@+id/action_home_to_login" app:destination="@id/loginFragment"
+            app:popUpTo="@id/homeFragment" app:popUpToInclusive="true"/>
+        <action android:id="@+id/action_home_to_shopList" app:destination="@id/shopListFragment"/>
+        <action android:id="@+id/action_home_to_shopDetail" app:destination="@id/shopDetailFragment"/>
+        <action android:id="@+id/action_home_to_myBookings" app:destination="@id/myBookingsFragment"/>
+    </fragment>
+
+    <fragment android:id="@+id/shopListFragment"
+        android:name="edu.cit.canete.laundrylink.ui.fragment.ShopListFragment"
+        android:label="Find a Shop">
+        <action android:id="@+id/action_shopList_to_shopDetail" app:destination="@id/shopDetailFragment"/>
+    </fragment>
+
+    <fragment android:id="@+id/shopDetailFragment"
+        android:name="edu.cit.canete.laundrylink.ui.fragment.ShopDetailFragment"
+        android:label="Shop Detail">
+        <argument android:name="shopId" app:argType="string"/>
+        <action android:id="@+id/action_shopDetail_to_bookingFlow" app:destination="@id/bookingFlowFragment"/>
+    </fragment>
+
+    <fragment android:id="@+id/bookingFlowFragment"
+        android:name="edu.cit.canete.laundrylink.ui.fragment.BookingFlowFragment"
+        android:label="Book a Slot">
+        <argument android:name="shopId" app:argType="string"/>
+        <argument android:name="serviceId" app:argType="string"/>
+        <action android:id="@+id/action_bookingFlow_to_confirmation" app:destination="@id/bookingConfirmationFragment"/>
+    </fragment>
+
+    <fragment android:id="@+id/bookingConfirmationFragment"
+        android:name="edu.cit.canete.laundrylink.ui.fragment.BookingConfirmationFragment"
+        android:label="Booking Confirmation">
+        <argument android:name="bookingId" app:argType="string"/>
+        <action android:id="@+id/action_confirmation_to_myBookings" app:destination="@id/myBookingsFragment"
+            app:popUpTo="@id/homeFragment"/>
+    </fragment>
+
+    <fragment android:id="@+id/myBookingsFragment"
+        android:name="edu.cit.canete.laundrylink.ui.fragment.MyBookingsFragment"
+        android:label="My Bookings">
+        <action android:id="@+id/action_myBookings_to_confirmation" app:destination="@id/bookingConfirmationFragment"/>
     </fragment>
 
 </navigation>

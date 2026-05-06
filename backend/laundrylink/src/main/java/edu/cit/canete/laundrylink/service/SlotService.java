@@ -37,8 +37,8 @@ public class SlotService {
             Map<String, Object> entry = new HashMap<>();
             entry.put("slotConfigId", config.getId());
             entry.put("date", config.getConfigDate());
-            entry.put("startTime", config.getStartTime());
-            entry.put("endTime", config.getEndTime());
+            entry.put("startTime", startTime);
+            entry.put("endTime", endTime);
             entry.put("maxSlots", config.getMaxSlots());
             entry.put("reserved", reserved);
             entry.put("available", available);
