@@ -65,6 +65,8 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.0.0")
     // Chrome Custom Tabs for PayMongo checkout
     implementation("androidx.browser:browser:1.8.0")
+    // Pull-to-refresh for the bookings list
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("io.mockk:mockk:1.13.10")

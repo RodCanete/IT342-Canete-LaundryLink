@@ -79,11 +79,14 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLogin"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="52dp"
             android:text="Log In"
+            android:textColor="#FFFFFF"
             android:textSize="16sp"
+            android:textStyle="bold"
             android:layout_marginTop="16dp"
-            android:backgroundTint="#1E40AF"/>
+            android:backgroundTint="#1E40AF"
+            app:cornerRadius="10dp"/>
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
             android:id="@+id/progressBar"
@@ -100,6 +103,8 @@
             android:layout_height="wrap_content"
             android:text="Don't have an account? Sign up"
             android:textColor="#1E40AF"
+            android:textSize="14sp"
+            android:textStyle="bold"
             android:layout_marginTop="8dp"/>
 
     </LinearLayout>

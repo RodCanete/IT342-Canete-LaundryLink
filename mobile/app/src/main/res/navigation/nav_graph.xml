@@ -25,6 +25,7 @@
         <action android:id="@+id/action_home_to_login" app:destination="@id/loginFragment"
             app:popUpTo="@id/homeFragment" app:popUpToInclusive="true"/>
         <action android:id="@+id/action_home_to_shopList" app:destination="@id/shopListFragment"/>
+        <action android:id="@+id/action_home_to_shopDetail" app:destination="@id/shopDetailFragment"/>
         <action android:id="@+id/action_home_to_myBookings" app:destination="@id/myBookingsFragment"/>
     </fragment>
 

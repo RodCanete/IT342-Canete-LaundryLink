@@ -1,5 +1,6 @@
 package edu.cit.canete.laundrylink.ui.adapter
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -25,29 +26,57 @@ class SlotAdapter(
         val isSelected = slot.slotConfigId == selectedId
         with(holder.binding) {
             tvSlotTime.text = formatTime(slot.startTime)
-            tvSlotAvailable.text = if (isAvailable) "${slot.available} left" else "Full"
-            cardSlot.alpha = if (isAvailable) 1f else 0.4f
+            tvSlotAvailable.text = if (isAvailable) "${slot.available} available" else "Full"
+            cardSlot.alpha = if (isAvailable) 1f else 0.5f
             cardSlot.isEnabled = isAvailable
-            cardSlot.strokeColor = if (isSelected)
-                holder.itemView.context.getColor(android.R.color.holo_blue_dark)
-            else
-                holder.itemView.context.getColor(android.R.color.darker_gray)
+            cardSlot.isClickable = isAvailable
+
+            val context = holder.itemView.context
+            if (isSelected) {
+                cardSlot.strokeColor = Color.parseColor("#1E40AF")
+                cardSlot.strokeWidth = (3 * context.resources.displayMetrics.density).toInt()
+                cardSlot.setCardBackgroundColor(Color.parseColor("#1E40AF"))
+                tvSlotTime.setTextColor(Color.WHITE)
+                tvSlotAvailable.setTextColor(Color.parseColor("#DBEAFE"))
+            } else {
+                cardSlot.strokeColor = Color.parseColor("#E5E7EB")
+                cardSlot.strokeWidth = (1 * context.resources.displayMetrics.density).toInt()
+                cardSlot.setCardBackgroundColor(Color.WHITE)
+                tvSlotTime.setTextColor(Color.parseColor("#1F2937"))
+                tvSlotAvailable.setTextColor(Color.parseColor("#6B7280"))
+            }
+
             cardSlot.setOnClickListener {
-                if (isAvailable) {
-                    selectedId = slot.slotConfigId
-                    notifyDataSetChanged()
-                    onSlotSelected(slot)
-                }
+                if (!isAvailable) return@setOnClickListener
+                val previousId = selectedId
+                selectedId = slot.slotConfigId
+                refreshSelection(previousId, slot.slotConfigId)
+                onSlotSelected(slot)
             }
         }
     }
 
     fun setSelected(slotId: String?) {
+        val previous = selectedId
+        if (previous == slotId) return
         selectedId = slotId
-        notifyDataSetChanged()
+        refreshSelection(previous, slotId)
     }
 
-    private fun formatTime(time: String): String {
+    private fun refreshSelection(previousId: String?, newId: String?) {
+        val list = currentList
+        if (previousId != null) {
+            val prevIdx = list.indexOfFirst { it.slotConfigId == previousId }
+            if (prevIdx >= 0) notifyItemChanged(prevIdx)
+        }
+        if (newId != null) {
+            val newIdx = list.indexOfFirst { it.slotConfigId == newId }
+            if (newIdx >= 0) notifyItemChanged(newIdx)
+        }
+    }
+
+    private fun formatTime(time: String?): String {
+        if (time.isNullOrBlank()) return "—"
         val parts = time.split(":")
         val h = parts.getOrNull(0)?.toIntOrNull() ?: return time
         val m = parts.getOrNull(1) ?: "00"
@@ -57,7 +86,7 @@ class SlotAdapter(
             h > 12 -> h - 12
             else -> h
         }
-        return "$h12:$m $ampm"
+        return "%02d:%s %s".format(h12, m, ampm)
     }
 
     companion object {

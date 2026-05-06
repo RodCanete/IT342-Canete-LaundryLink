@@ -80,9 +80,10 @@
                     android:layout_width="0dp"
                     android:layout_height="56dp"
                     android:layout_weight="1"
-                    android:text="BOOK NOW"
+                    android:text="Book Now"
                     android:backgroundTint="#3B82F6"
                     android:textColor="#FFFFFF"
+                    android:textSize="15sp"
                     android:textStyle="bold"
                     app:cornerRadius="12dp"/>
 
@@ -95,9 +96,10 @@
                     android:layout_width="0dp"
                     android:layout_height="56dp"
                     android:layout_weight="1"
-                    android:text="MY BOOKINGS"
+                    android:text="My Bookings"
                     android:backgroundTint="#0EA5E9"
                     android:textColor="#FFFFFF"
+                    android:textSize="15sp"
                     android:textStyle="bold"
                     app:cornerRadius="12dp"/>
 

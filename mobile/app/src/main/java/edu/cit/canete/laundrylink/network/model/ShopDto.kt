@@ -51,10 +51,10 @@ data class Service(
 
 data class Slot(
     val slotConfigId: String,
-    val date: String,
-    val startTime: String,
-    val endTime: String,
-    val maxSlots: Int,
-    val reserved: Int,
-    val available: Int
+    val date: String?,
+    val startTime: String?,
+    val endTime: String?,
+    val maxSlots: Int = 0,
+    val reserved: Int = 0,
+    val available: Int = 0
 )

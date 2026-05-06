@@ -83,11 +83,11 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupNearbyShops() {
-        shopAdapter = ShopAdapter { _ ->
+        shopAdapter = ShopAdapter { shop ->
             try {
                 findNavController().navigate(
-                    R.id.action_home_to_shopList,
-                    bundleOf()
+                    R.id.action_home_to_shopDetail,
+                    bundleOf("shopId" to shop.id)
                 )
             } catch (e: Exception) {
                 Log.e("HomeFragment", "Failed to navigate to shop details", e)
