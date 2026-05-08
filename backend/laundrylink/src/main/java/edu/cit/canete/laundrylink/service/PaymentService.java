@@ -11,6 +11,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.cit.canete.laundrylink.repository.BookingRepository;
 import edu.cit.canete.laundrylink.repository.PaymentRepository;
 import edu.cit.canete.laundrylink.service.event.PaymentSucceededEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +39,7 @@ import java.util.UUID;
 @Service
 public class PaymentService {
 
+    private static final Logger log = LoggerFactory.getLogger(PaymentService.class);
     private static final String DEFAULT_CURRENCY = "PHP";
 
     @Autowired
@@ -116,11 +119,16 @@ public class PaymentService {
     }
 
     public Map<String, Object> handleWebhook(String payload, String signatureHeader, String fallbackPaymentIntentId) {
+        log.info("Webhook received: signaturePresent={}, payloadLength={}",
+            signatureHeader != null && !signatureHeader.isBlank(),
+            payload == null ? 0 : payload.length());
         verifyWebhookSignature(payload, signatureHeader);
 
         String eventType = extractEventType(payload);
         String checkoutSessionId = extractCheckoutSessionId(payload);
         String paymentIntentIdFromPayload = extractPaymentIntentId(payload);
+        log.info("Webhook event parsed: eventType={}, checkoutSessionId={}, paymentIntentId={}",
+            eventType, checkoutSessionId, paymentIntentIdFromPayload);
 
         Optional<Payment> paymentByCheckout = checkoutSessionId == null
             ? Optional.empty()
@@ -135,6 +143,8 @@ public class PaymentService {
             .orElseThrow(() -> new RuntimeException("PAYMENT-001: Payment not found for webhook event"));
 
         PaymentStatus mappedStatus = mapStatusFromEvent(eventType);
+        log.info("Webhook mapped: paymentId={}, currentStatus={}, mappedStatus={}",
+            payment.getId(), payment.getStatus(), mappedStatus);
         if (mappedStatus == null) {
             return toPaymentMap(payment, eventType);
         }
@@ -146,6 +156,7 @@ public class PaymentService {
         }
 
         paymentRepository.save(payment);
+        log.info("Webhook applied: paymentId={}, newStatus={}", payment.getId(), payment.getStatus());
         return toPaymentMap(payment, eventType);
     }
 
@@ -168,21 +179,26 @@ public class PaymentService {
 
     private Payment reconcilePaymentStatus(Payment payment) {
         if (payment.getStatus() != PaymentStatus.PENDING) {
+            log.debug("Reconcile skipped: paymentId={} already in status {}", payment.getId(), payment.getStatus());
             return payment;
         }
 
         String checkoutSessionId = payment.getCheckoutSessionId();
         if (checkoutSessionId == null || checkoutSessionId.isBlank()) {
+            log.warn("Reconcile skipped: paymentId={} has no checkoutSessionId", payment.getId());
             return payment;
         }
 
         String secretKey = resolveSecretKey();
         if (secretKey == null) {
+            log.warn("Reconcile skipped: PAYMONGO_SECRET_KEY not configured");
             return payment;
         }
 
         try {
+            log.info("Reconciling paymentId={} via PayMongo session {}", payment.getId(), checkoutSessionId);
             PaymentStatus providerStatus = fetchCheckoutSessionStatus(checkoutSessionId, secretKey);
+            log.info("Reconcile result: paymentId={}, providerStatus={}", payment.getId(), providerStatus);
             if (providerStatus == null || providerStatus == payment.getStatus()) {
                 return payment;
             }
@@ -193,11 +209,13 @@ public class PaymentService {
                     payment.setPaidAt(LocalDateTime.now());
                 }
                 publishPaymentSucceeded(payment.getBooking().getId());
-                payment.getBooking().setStatus(BookingStatus.PAID);
             }
 
-            return paymentRepository.save(payment);
+            Payment saved = paymentRepository.save(payment);
+            log.info("Reconcile persisted: paymentId={}, newStatus={}", saved.getId(), saved.getStatus());
+            return saved;
         } catch (Exception e) {
+            log.error("Reconcile failed for paymentId={}: {}", payment.getId(), e.getMessage(), e);
             return payment;
         }
     }
@@ -214,18 +232,21 @@ public class PaymentService {
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() >= 400) {
+                log.warn("PayMongo session fetch failed: status={}, body={}", response.statusCode(), response.body());
                 return null;
             }
 
             JsonNode root = objectMapper.readTree(response.body());
-            String providerStatus = firstText(root, List.of(
-                "/data/attributes/payment_intent/attributes/status",
-                "/data/attributes/payments/0/attributes/status",
-                "/data/attributes/status"
-            ));
+            String sessionStatus = textValue(root.at("/data/attributes/status"));
+            String paymentIntentStatus = textValue(root.at("/data/attributes/payment_intent/attributes/status"));
+            String firstPaymentStatus = textValue(root.at("/data/attributes/payments/0/attributes/status"));
+            log.info("PayMongo session {}: sessionStatus={}, paymentIntentStatus={}, firstPaymentStatus={}",
+                checkoutSessionId, sessionStatus, paymentIntentStatus, firstPaymentStatus);
 
+            String providerStatus = firstNonBlank(firstPaymentStatus, paymentIntentStatus, sessionStatus);
             return mapStatusFromProvider(providerStatus);
         } catch (Exception e) {
+            log.error("PayMongo session fetch threw: {}", e.getMessage(), e);
             return null;
         }
     }
@@ -235,18 +256,21 @@ public class PaymentService {
             return null;
         }
 
-        String normalized = providerStatus.toLowerCase();
-        if (normalized.contains("paid") || normalized.contains("succeed")) {
-            return PaymentStatus.SUCCEEDED;
+        String normalized = providerStatus.toLowerCase().trim();
+        switch (normalized) {
+            case "paid":
+            case "succeeded":
+                return PaymentStatus.SUCCEEDED;
+            case "failed":
+            case "cancelled":
+            case "canceled":
+            case "expired":
+                return PaymentStatus.FAILED;
+            case "refunded":
+                return PaymentStatus.REFUNDED;
+            default:
+                return null;
         }
-        if (normalized.contains("fail") || normalized.contains("cancel") || normalized.contains("expire")) {
-            return PaymentStatus.FAILED;
-        }
-        if (normalized.contains("refund")) {
-            return PaymentStatus.REFUNDED;
-        }
-
-        return null;
     }
 
     private PayMongoCheckoutSession createCheckoutSession(Booking booking, Payment payment) {

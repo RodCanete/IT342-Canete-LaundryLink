@@ -1,8 +1,11 @@
 package edu.cit.canete.laundrylink.ui.fragment
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -91,8 +94,30 @@ class BookingConfirmationFragment : Fragment() {
                 binding.tvWaitingForPayment.isVisible =
                     !isPaid && state.paymentIntent?.checkoutUrl != null && !state.initiatingPayment
                 binding.tvPaidSuccess.isVisible = isPaid
+
+                val qrUrl = state.booking?.qrCodeUrl
+                if (isPaid && !qrUrl.isNullOrBlank()) {
+                    val bitmap = decodeDataUrl(qrUrl)
+                    if (bitmap != null) {
+                        binding.ivQrCode.setImageBitmap(bitmap)
+                        binding.ivQrCode.isVisible = true
+                    } else {
+                        binding.ivQrCode.isVisible = false
+                    }
+                } else {
+                    binding.ivQrCode.isVisible = false
+                }
             }
         }
+    }
+
+    private fun decodeDataUrl(dataUrl: String): Bitmap? = try {
+        val base64 = dataUrl.substringAfter("base64,", dataUrl)
+        val bytes = Base64.decode(base64, Base64.DEFAULT)
+        BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+    } catch (e: Exception) {
+        Log.w("BookingConfirmation", "Failed to decode QR data URL", e)
+        null
     }
 
     override fun onResume() {

@@ -38,6 +38,9 @@ public class BookingService {
     @Autowired
     private AuthenticatedUserService authenticatedUserService;
 
+    @Autowired
+    private QrCodeService qrCodeService;
+
     public Map<String, Object> createBooking(CreateBookingRequest request, String authorizationHeader) {
         User user = authenticatedUserService.requireUser(authorizationHeader);
         Shop shop = shopRepository.findById(request.getShopId())
@@ -104,6 +107,12 @@ public class BookingService {
         Booking booking = bookingRepository.findById(bookingId)
             .orElseThrow(() -> new RuntimeException("BOOKING-001: Booking not found"));
         booking.setStatus(BookingStatus.PAID);
+        if (booking.getQrCodeUrl() == null || booking.getQrCodeUrl().isBlank()) {
+            String qr = qrCodeService.generateBase64DataUrl(booking.getBookingCode());
+            if (qr != null) {
+                booking.setQrCodeUrl(qr);
+            }
+        }
         return bookingRepository.save(booking);
     }
 
@@ -125,6 +134,21 @@ public class BookingService {
         if (!booking.getShop().getId().equals(ownerShop.getId())) {
             throw new RuntimeException("AUTH-003: Booking does not belong to your shop");
         }
+
+        Set<BookingStatus> allowed = ALLOWED_TRANSITIONS.getOrDefault(booking.getStatus(), Set.of());
+        if (!allowed.contains(newStatus)) {
+            throw new RuntimeException(
+                "BOOKING-002: Cannot transition from " + booking.getStatus() + " to " + newStatus
+            );
+        }
+
+        booking.setStatus(newStatus);
+        return bookingRepository.save(booking);
+    }
+
+    public Booking updateStatusAsAdmin(UUID bookingId, BookingStatus newStatus) {
+        Booking booking = bookingRepository.findById(bookingId)
+            .orElseThrow(() -> new RuntimeException("BOOKING-001: Booking not found"));
 
         Set<BookingStatus> allowed = ALLOWED_TRANSITIONS.getOrDefault(booking.getStatus(), Set.of());
         if (!allowed.contains(newStatus)) {

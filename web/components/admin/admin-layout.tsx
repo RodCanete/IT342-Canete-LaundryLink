@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Link, useLocation } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import {
   WashingMachine,
   ClipboardList,
@@ -7,8 +7,8 @@ import {
   LogOut,
   ChevronRight,
 } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { logout } from "@/lib/auth"
 
 const sidebarLinks = [
   { label: "All Bookings", href: "/admin", icon: ClipboardList },
@@ -18,6 +18,12 @@ const sidebarLinks = [
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false)
   const { pathname } = useLocation()
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    logout()
+    navigate("/login")
+  }
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -66,13 +72,14 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             <ChevronRight className={cn("h-4 w-4 transition-transform", collapsed ? "" : "rotate-180")} />
             {!collapsed && "Collapse"}
           </button>
-          <Link
-            to="/"
-            className="mt-1 flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-sidebar-foreground/60 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-colors"
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-sidebar-foreground/60 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-colors"
           >
             <LogOut className="h-4 w-4 shrink-0" />
             {!collapsed && "Log Out"}
-          </Link>
+          </button>
         </div>
       </aside>
 

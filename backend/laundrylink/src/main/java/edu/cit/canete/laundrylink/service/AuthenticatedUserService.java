@@ -1,6 +1,7 @@
 package edu.cit.canete.laundrylink.service;
 
 import edu.cit.canete.laundrylink.entity.User;
+import edu.cit.canete.laundrylink.entity.UserRole;
 import edu.cit.canete.laundrylink.repository.UserRepository;
 import edu.cit.canete.laundrylink.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,5 +29,13 @@ public class AuthenticatedUserService {
         String email = jwtUtil.extractEmail(token);
         return userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("Authenticated user not found"));
+    }
+
+    public User requireAdmin(String authorizationHeader) {
+        User user = requireUser(authorizationHeader);
+        if (!UserRole.ADMIN.name().equalsIgnoreCase(user.getRole())) {
+            throw new RuntimeException("AUTH-002: Admin access required");
+        }
+        return user;
     }
 }
