@@ -1,11 +1,11 @@
-import { Navbar } from "@/components/navbar"
-import { Footer } from "@/components/footer"
-import { HeroSection } from "@/components/landing/hero-section"
-import { MarqueeStrip } from "@/components/landing/marquee-strip"
-import { ShopListSection } from "@/components/landing/shop-list-section"
-import { HowItWorksSection } from "@/components/landing/how-it-works-section"
-import { StatsBand } from "@/components/landing/stats-band"
-import { CtaSection } from "@/components/landing/cta-section"
+import { Navbar } from "@/shared/components/navbar"
+import { Footer } from "@/shared/components/footer"
+import { HeroSection } from "@/features/landing/components/hero-section"
+import { MarqueeStrip } from "@/features/landing/components/marquee-strip"
+import { ShopListSection } from "@/features/landing/components/shop-list-section"
+import { HowItWorksSection } from "@/features/landing/components/how-it-works-section"
+import { StatsBand } from "@/features/landing/components/stats-band"
+import { CtaSection } from "@/features/landing/components/cta-section"
 
 export default function HomePage() {
   return (

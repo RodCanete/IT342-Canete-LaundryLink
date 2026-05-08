@@ -1,5 +1,5 @@
-import { DashboardGuard } from "@/components/auth/dashboard-guard"
-import { ServicesManagement } from "@/components/shop-owner/services-management"
+import { DashboardGuard } from "@/features/auth/components/dashboard-guard"
+import { ServicesManagement } from "@/features/shop-owner/components/services-management"
 
 export default function ShopOwnerServicesPage() {
   return (

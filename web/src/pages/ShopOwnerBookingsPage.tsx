@@ -1,5 +1,5 @@
-import { DashboardGuard } from "@/components/auth/dashboard-guard"
-import { OwnerBookings } from "@/components/shop-owner/owner-bookings"
+import { DashboardGuard } from "@/features/auth/components/dashboard-guard"
+import { OwnerBookings } from "@/features/shop-owner/components/owner-bookings"
 
 export default function ShopOwnerBookingsPage() {
   return (

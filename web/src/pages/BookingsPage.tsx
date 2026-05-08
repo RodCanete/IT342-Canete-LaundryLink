@@ -1,7 +1,7 @@
-import { DashboardGuard } from "@/components/auth/dashboard-guard"
-import { Navbar } from "@/components/navbar"
-import { Footer } from "@/components/footer"
-import { MyBookingsView } from "@/components/booking/my-bookings-view"
+import { DashboardGuard } from "@/features/auth/components/dashboard-guard"
+import { Navbar } from "@/shared/components/navbar"
+import { Footer } from "@/shared/components/footer"
+import { MyBookingsView } from "@/features/booking/components/my-bookings-view"
 
 export default function BookingsPage() {
   return (

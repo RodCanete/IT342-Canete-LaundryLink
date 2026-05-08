@@ -1,7 +1,7 @@
 import { useParams, useSearchParams } from "react-router-dom"
-import { Navbar } from "@/components/navbar"
-import { Footer } from "@/components/footer"
-import { BookingFlow } from "@/components/booking/booking-flow"
+import { Navbar } from "@/shared/components/navbar"
+import { Footer } from "@/shared/components/footer"
+import { BookingFlow } from "@/features/booking/components/booking-flow"
 
 export default function BookPage() {
   const { id } = useParams<{ id: string }>()

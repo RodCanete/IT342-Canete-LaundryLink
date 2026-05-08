@@ -1,4 +1,4 @@
-import { AdminBookingsTable } from "@/components/admin/admin-bookings-table"
+import { AdminBookingsTable } from "@/features/admin/components/admin-bookings-table"
 
 export default function AdminPage() {
   return <AdminBookingsTable />
