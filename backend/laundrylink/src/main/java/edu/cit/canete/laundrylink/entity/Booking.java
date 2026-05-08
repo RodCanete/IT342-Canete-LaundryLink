@@ -59,7 +59,7 @@ public class Booking {
     @Column(name = "file_url")
     private String fileUrl;
 
-    @Column(name = "qr_code_url")
+    @Column(name = "qr_code_url", columnDefinition = "TEXT")
     private String qrCodeUrl;
 
     @Column(name = "created_at")

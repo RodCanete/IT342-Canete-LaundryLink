@@ -281,12 +281,25 @@ export function BookingConfirmation({
         <Card className="border-border">
           <CardContent className="flex flex-col gap-6 p-6">
             <div className="flex flex-col items-center gap-4">
-              <div className="flex h-40 w-40 items-center justify-center rounded-2xl border-2 border-dashed border-border bg-muted/30">
-                <QrCode className="h-20 w-20 text-primary/30" />
-              </div>
+              {booking.qrCodeUrl ? (
+                <img
+                  src={booking.qrCodeUrl}
+                  alt={`QR for ${booking.bookingCode}`}
+                  className="h-40 w-40 rounded-2xl border border-border bg-white p-2"
+                />
+              ) : (
+                <div className="flex h-40 w-40 items-center justify-center rounded-2xl border-2 border-dashed border-border bg-muted/30">
+                  <QrCode className="h-20 w-20 text-primary/30" />
+                </div>
+              )}
               <div className="text-center">
                 <p className="text-xs text-muted-foreground">Booking Code</p>
                 <p className="text-xl font-bold tracking-widest text-foreground">{booking.bookingCode}</p>
+                {!booking.qrCodeUrl && isPendingPayment && (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    QR code will appear here once payment is confirmed.
+                  </p>
+                )}
               </div>
             </div>
 

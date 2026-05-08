@@ -47,4 +47,40 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
         @Param("startTime") java.time.LocalTime startTime,
         @Param("endTime") java.time.LocalTime endTime
     );
+
+    List<Booking> findAllByOrderByBookingDateDescTimeSlotDesc();
+
+    @Query("""
+        select b
+        from Booking b
+        where (:date is null or b.bookingDate = :date)
+          and (:status is null or b.status = :status)
+          and (:shopId is null or b.shop.id = :shopId)
+          and (
+            :search is null
+            or lower(b.bookingCode) like lower(concat('%', :search, '%'))
+            or lower(b.user.email) like lower(concat('%', :search, '%'))
+            or lower(concat(b.user.firstName, ' ', b.user.lastName))
+                 like lower(concat('%', :search, '%'))
+          )
+        order by b.bookingDate desc, b.timeSlot desc
+    """)
+    List<Booking> searchAdminBookings(
+        @Param("date") LocalDate date,
+        @Param("status") BookingStatus status,
+        @Param("shopId") UUID shopId,
+        @Param("search") String search
+    );
+
+    @Query("""
+        select count(b)
+        from Booking b
+        where b.shop.id = :shopId
+          and b.service.serviceType = edu.cit.canete.laundrylink.entity.ServiceType.PRIORITY
+          and b.bookingDate = :bookingDate
+    """)
+    long countPriorityBookingsForShopAndDate(
+        @Param("shopId") UUID shopId,
+        @Param("bookingDate") LocalDate bookingDate
+    );
 }

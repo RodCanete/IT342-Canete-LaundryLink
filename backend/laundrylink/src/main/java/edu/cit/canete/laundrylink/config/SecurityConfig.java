@@ -29,6 +29,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/bookings/**").permitAll()
                 .requestMatchers("/api/payments/**").permitAll()
                 .requestMatchers("/api/owner/**").permitAll()
+                .requestMatchers("/api/admin/**").permitAll()
                 .requestMatchers("/error").permitAll()
                 .anyRequest().authenticated()
             );

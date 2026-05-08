@@ -65,6 +65,16 @@
                         android:textColor="#6B7280"
                         android:textSize="13sp" />
 
+                    <ImageView
+                        android:id="@+id/ivQrCode"
+                        android:layout_width="200dp"
+                        android:layout_height="200dp"
+                        android:layout_marginTop="16dp"
+                        android:background="#FFFFFF"
+                        android:padding="8dp"
+                        android:contentDescription="Booking QR code"
+                        android:visibility="gone" />
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

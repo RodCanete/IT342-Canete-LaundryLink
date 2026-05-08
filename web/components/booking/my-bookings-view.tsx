@@ -29,6 +29,7 @@ type BookingView = {
   status: BookingStatus
   amount: number
   fileUrl: string | null
+  qrCodeUrl: string | null
 }
 
 const statusConfig: Record<BookingStatus, { color: string; bg: string }> = {
@@ -91,6 +92,7 @@ export function MyBookingsView() {
               status: mapStatus(booking.status),
               amount: serviceInfo?.price || 0,
               fileUrl: booking.fileUrl,
+              qrCodeUrl: booking.qrCodeUrl,
             }
           })
 
@@ -236,9 +238,17 @@ export function MyBookingsView() {
                                   <DialogTitle className="text-center">Booking QR Code</DialogTitle>
                                 </DialogHeader>
                                 <div className="flex flex-col items-center gap-4 py-4">
-                                  <div className="flex h-48 w-48 items-center justify-center rounded-2xl border-2 border-dashed border-border bg-muted/30">
-                                    <QrCode className="h-24 w-24 text-primary/30" />
-                                  </div>
+                                  {booking.qrCodeUrl ? (
+                                    <img
+                                      src={booking.qrCodeUrl}
+                                      alt={`QR for ${booking.code}`}
+                                      className="h-48 w-48 rounded-2xl border border-border bg-white p-2"
+                                    />
+                                  ) : (
+                                    <div className="flex h-48 w-48 items-center justify-center rounded-2xl border-2 border-dashed border-border bg-muted/30">
+                                      <QrCode className="h-24 w-24 text-primary/30" />
+                                    </div>
+                                  )}
                                   <div className="text-center">
                                     <p className="text-lg font-bold tracking-widest text-foreground">
                                       {booking.code}
