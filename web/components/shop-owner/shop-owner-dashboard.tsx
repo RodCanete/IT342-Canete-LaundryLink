@@ -1,150 +1,182 @@
+import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import { CalendarCheck2, Landmark, Settings2, Sparkles, Users } from "lucide-react"
+import { CalendarCheck2, Landmark, Sparkles, Users } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { ShopOwnerLayout } from "@/components/shop-owner/shop-owner-layout"
+import {
+  formatBackendTime,
+  formatBookingDate,
+  statusToLabel,
+} from "@/lib/booking-api"
+import {
+  getOwnerDashboard,
+  type OwnerDashboardApi,
+} from "@/lib/owner-api"
 
-const shopMetrics = [
-  { label: "Today's Bookings", value: "18", icon: CalendarCheck2, tone: "text-primary" },
-  { label: "Priority Slots Used", value: "7 / 10", icon: Sparkles, tone: "text-accent" },
-  { label: "Active Customers", value: "42", icon: Users, tone: "text-success" },
-  { label: "Shop Status", value: "Open", icon: Landmark, tone: "text-warning" },
-]
-
-const recentBookings = [
-  { code: "LL-2026-0411", customer: "Maria Santos", service: "Priority", status: "Paid", time: "10:00 AM" },
-  { code: "LL-2026-0412", customer: "Juan Dela Cruz", service: "Standard", status: "Dropped Off", time: "10:30 AM" },
-  { code: "LL-2026-0413", customer: "Ana Reyes", service: "Priority", status: "Processing", time: "11:00 AM" },
-]
-
-const slotSummary = [
-  { date: "Today", limit: 10, used: 7 },
-  { date: "Tomorrow", limit: 10, used: 5 },
-  { date: "Apr 08", limit: 10, used: 9 },
-]
+function formatSlotDate(dateString: string): string {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const target = new Date(`${dateString}T00:00:00`)
+  const diff = Math.round((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+  if (diff === 0) return "Today"
+  if (diff === 1) return "Tomorrow"
+  return target.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+}
 
 export function ShopOwnerDashboard() {
+  const [data, setData] = useState<OwnerDashboardApi | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    setLoading(true)
+    getOwnerDashboard()
+      .then((res) => {
+        if (!cancelled) {
+          setData(res)
+          setError(null)
+        }
+      })
+      .catch((err: Error) => {
+        if (!cancelled) {
+          setError(err.message)
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const slotRatio =
+    data && data.prioritySlotsCapacity > 0
+      ? `${data.prioritySlotsUsed} / ${data.prioritySlotsCapacity}`
+      : "0 / 0"
+
+  const metrics = [
+    { label: "Today's Bookings", value: data?.todaysBookings ?? 0, icon: CalendarCheck2, tone: "text-primary" },
+    { label: "Priority Slots Used", value: slotRatio, icon: Sparkles, tone: "text-accent" },
+    { label: "Active Customers", value: data?.activeCustomers ?? 0, icon: Users, tone: "text-success" },
+    { label: "Shop Status", value: data?.shop ? "Open" : "—", icon: Landmark, tone: "text-warning" },
+  ]
+
   return (
-    <div className="flex min-h-screen bg-background">
-      <aside className="hidden w-72 flex-col border-r border-border bg-card lg:flex">
-        <div className="flex h-16 items-center gap-2.5 border-b border-border px-6">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-            <Settings2 className="h-5 w-5 text-primary-foreground" />
-          </div>
-          <div>
-            <p className="text-sm font-bold text-foreground">LaundryLink</p>
-            <p className="text-[10px] text-muted-foreground">Shop Owner Dashboard</p>
-          </div>
-        </div>
-        <nav className="flex flex-1 flex-col gap-1 p-4">
-          <Link to="/shop-owner/dashboard" className="rounded-lg bg-primary/10 px-3 py-2.5 text-sm font-medium text-primary">
-            Overview
-          </Link>
-          <Link to="/shops" className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
-            View Shops
-          </Link>
-          <Link to="/bookings" className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
-            Customer Bookings
-          </Link>
-        </nav>
-        <div className="border-t border-border p-4 text-xs text-muted-foreground">
-          Separate dashboard for shop operations and booking management.
-        </div>
-      </aside>
+    <ShopOwnerLayout
+      title="Operations overview"
+      description="Monitor bookings, capacity, and slot limits for your laundromat."
+      actions={
+        <>
+          <Button variant="outline" onClick={() => window.location.reload()}>
+            Refresh
+          </Button>
+          <Button asChild>
+            <Link to="/shop-owner/schedule">Manage Schedule</Link>
+          </Button>
+        </>
+      }
+    >
+      {error && (
+        <Card className="mb-6 border-destructive/40 bg-destructive/5">
+          <CardContent className="p-4 text-sm text-destructive">
+            Failed to load dashboard: {error}
+          </CardContent>
+        </Card>
+      )}
 
-      <div className="flex min-h-screen flex-1 flex-col">
-        <header className="border-b border-border bg-background/90 px-4 py-4 backdrop-blur lg:px-8">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <Badge variant="secondary" className="mb-2 border-none bg-primary/10 text-primary">
-                Shop Owner Dashboard
-              </Badge>
-              <h1 className="text-2xl font-bold tracking-tight text-foreground">Operations overview</h1>
-              <p className="mt-1 text-sm text-muted-foreground">Monitor bookings, capacity, and slot limits for your laundromat.</p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Button asChild variant="outline">
-                <Link to="/shop-owner/dashboard">Refresh View</Link>
-              </Button>
-              <Button asChild>
-                <Link to="/shops">Open Shop List</Link>
-              </Button>
-            </div>
-          </div>
-        </header>
-
-        <main className="flex-1 space-y-8 bg-gradient-to-b from-background via-background to-muted/20 px-4 py-8 lg:px-8">
-          <div className="grid gap-4 xl:grid-cols-4">
-            {shopMetrics.map((metric) => (
-              <Card key={metric.label} className="border-border shadow-sm">
-                <CardContent className="flex items-center gap-4 p-5">
-                  <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary/70 ${metric.tone}`}>
-                    <metric.icon className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">{metric.label}</p>
-                    <p className="text-2xl font-bold text-foreground">{metric.value}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <div className="grid gap-6 xl:grid-cols-[1.5fr_1fr]">
-            <Card className="border-border shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-base">Recent Bookings</CardTitle>
-                <CardDescription>Review the latest customer bookings and queue state.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {recentBookings.map((booking, index) => (
-                    <div key={booking.code}>
-                      <div className="flex items-center justify-between gap-4">
-                        <div>
-                          <p className="font-medium text-foreground">{booking.customer}</p>
-                          <p className="text-xs text-muted-foreground">{booking.code} · {booking.service} · {booking.time}</p>
-                        </div>
-                        <Badge variant="secondary" className="border-none bg-primary/10 text-primary">
-                          {booking.status}
-                        </Badge>
-                      </div>
-                      {index < recentBookings.length - 1 && <Separator className="mt-4" />}
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-base">Priority Slot Limits</CardTitle>
-                <CardDescription>Track daily capacity and adjust allocations as demand changes.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {slotSummary.map((slot) => {
-                  const ratio = Math.round((slot.used / slot.limit) * 100)
-                  return (
-                    <div key={slot.date} className="rounded-xl border border-border p-4">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="font-medium text-foreground">{slot.date}</span>
-                        <span className="text-muted-foreground">{slot.used} / {slot.limit}</span>
-                      </div>
-                      <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-secondary">
-                        <div className="h-full rounded-full bg-primary" style={{ width: `${ratio}%` }} />
-                      </div>
-                    </div>
-                  )
-                })}
-                <Button className="w-full" variant="outline">
-                  Manage Slot Limits
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </main>
+      <div className="grid gap-4 xl:grid-cols-4">
+        {metrics.map((metric) => (
+          <Card key={metric.label} className="border-border shadow-sm">
+            <CardContent className="flex items-center gap-4 p-5">
+              <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary/70 ${metric.tone}`}>
+                <metric.icon className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">{metric.label}</p>
+                <p className="text-2xl font-bold text-foreground">{loading ? "—" : metric.value}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
-    </div>
+
+      <div className="mt-8 grid gap-6 xl:grid-cols-[1.5fr_1fr]">
+        <Card className="border-border shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-base">Recent Bookings</CardTitle>
+            <CardDescription>The latest customer bookings at your shop.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <p className="text-sm text-muted-foreground">Loading…</p>
+            ) : !data || data.recentBookings.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No bookings yet.</p>
+            ) : (
+              <div className="space-y-4">
+                {data.recentBookings.map((booking, index) => (
+                  <div key={booking.id}>
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <p className="font-medium text-foreground">{booking.customerName}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {booking.bookingCode} · {booking.serviceName} ·{" "}
+                          {formatBookingDate(booking.bookingDate)} {formatBackendTime(booking.timeSlot)}
+                        </p>
+                      </div>
+                      <Badge variant="secondary" className="border-none bg-primary/10 text-primary">
+                        {statusToLabel(booking.status)}
+                      </Badge>
+                    </div>
+                    {index < data.recentBookings.length - 1 && <Separator className="mt-4" />}
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="border-border shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-base">Priority Slot Capacity</CardTitle>
+            <CardDescription>Slot usage for the next 3 days.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {loading ? (
+              <p className="text-sm text-muted-foreground">Loading…</p>
+            ) : !data || data.slotSummary.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No slot configurations.</p>
+            ) : (
+              data.slotSummary.map((slot) => {
+                const ratio = slot.limit > 0 ? Math.round((slot.used / slot.limit) * 100) : 0
+                return (
+                  <div key={slot.date} className="rounded-xl border border-border p-4">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="font-medium text-foreground">{formatSlotDate(slot.date)}</span>
+                      <span className="text-muted-foreground">
+                        {slot.used} / {slot.limit}
+                      </span>
+                    </div>
+                    <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-secondary">
+                      <div
+                        className="h-full rounded-full bg-primary"
+                        style={{ width: `${Math.min(100, ratio)}%` }}
+                      />
+                    </div>
+                  </div>
+                )
+              })
+            )}
+            <Button asChild className="w-full" variant="outline">
+              <Link to="/shop-owner/schedule">Manage Slot Limits</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    </ShopOwnerLayout>
   )
 }

@@ -21,6 +21,9 @@ import {
   Settings2,
   ShieldCheck,
   BookOpen,
+  Store,
+  Tags,
+  CalendarRange,
   type LucideIcon,
 } from "lucide-react"
 import { getCurrentUser, getDashboardPath, logout, type User as AuthUser } from "@/lib/auth"
@@ -43,7 +46,10 @@ const customerLinks: NavLink[] = [
 
 const shopOwnerLinks: NavLink[] = [
   { label: "Dashboard", href: "/shop-owner/dashboard", icon: LayoutDashboard },
-  { label: "Slot Config", href: "/admin/slots", icon: Settings2 },
+  { label: "My Shop", href: "/shop-owner/shop", icon: Store },
+  { label: "Services", href: "/shop-owner/services", icon: Tags },
+  { label: "Schedule", href: "/shop-owner/schedule", icon: CalendarRange },
+  { label: "Bookings", href: "/shop-owner/bookings", icon: CalendarCheck2 },
 ]
 
 const adminLinks: NavLink[] = [
@@ -161,9 +167,9 @@ export function Navbar() {
                 )}
                 {user.role === "SHOP_OWNER" && (
                   <DropdownMenuItem asChild>
-                    <Link to="/admin/slots" className="flex items-center gap-2">
-                      <Settings2 className="h-4 w-4" />
-                      Slot Config
+                    <Link to="/shop-owner/bookings" className="flex items-center gap-2">
+                      <CalendarCheck2 className="h-4 w-4" />
+                      Bookings
                     </Link>
                   </DropdownMenuItem>
                 )}

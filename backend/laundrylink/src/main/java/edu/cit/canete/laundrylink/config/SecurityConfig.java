@@ -28,6 +28,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/slots/**").permitAll()
                 .requestMatchers("/api/bookings/**").permitAll()
                 .requestMatchers("/api/payments/**").permitAll()
+                .requestMatchers("/api/owner/**").permitAll()
                 .requestMatchers("/error").permitAll()
                 .anyRequest().authenticated()
             );

@@ -17,6 +17,7 @@ import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -103,6 +104,36 @@ public class BookingService {
         Booking booking = bookingRepository.findById(bookingId)
             .orElseThrow(() -> new RuntimeException("BOOKING-001: Booking not found"));
         booking.setStatus(BookingStatus.PAID);
+        return bookingRepository.save(booking);
+    }
+
+    private static final Map<BookingStatus, Set<BookingStatus>> ALLOWED_TRANSITIONS = Map.of(
+        BookingStatus.PENDING_PAYMENT, Set.of(),
+        BookingStatus.PAID, Set.of(BookingStatus.DROPPED_OFF),
+        BookingStatus.DROPPED_OFF, Set.of(BookingStatus.PROCESSING),
+        BookingStatus.PROCESSING, Set.of(BookingStatus.COMPLETED),
+        BookingStatus.COMPLETED, Set.of()
+    );
+
+    public Booking updateStatus(UUID bookingId, BookingStatus newStatus, User owner) {
+        Booking booking = bookingRepository.findById(bookingId)
+            .orElseThrow(() -> new RuntimeException("BOOKING-001: Booking not found"));
+
+        Shop ownerShop = shopRepository.findFirstByOwner_Id(owner.getId())
+            .orElseThrow(() -> new RuntimeException("OWNER-001: No shop linked to this owner"));
+
+        if (!booking.getShop().getId().equals(ownerShop.getId())) {
+            throw new RuntimeException("AUTH-003: Booking does not belong to your shop");
+        }
+
+        Set<BookingStatus> allowed = ALLOWED_TRANSITIONS.getOrDefault(booking.getStatus(), Set.of());
+        if (!allowed.contains(newStatus)) {
+            throw new RuntimeException(
+                "BOOKING-002: Cannot transition from " + booking.getStatus() + " to " + newStatus
+            );
+        }
+
+        booking.setStatus(newStatus);
         return bookingRepository.save(booking);
     }
 
