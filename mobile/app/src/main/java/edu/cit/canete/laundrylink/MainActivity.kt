@@ -3,7 +3,7 @@ package edu.cit.canete.laundrylink
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import edu.cit.canete.laundrylink.databinding.ActivityMainBinding
-import edu.cit.canete.laundrylink.network.RetrofitClient
+import edu.cit.canete.laundrylink.shared.network.RetrofitClient
 
 class MainActivity : AppCompatActivity() {
 

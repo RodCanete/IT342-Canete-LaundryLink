@@ -1,15 +1,15 @@
 import { useState, FormEvent } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
+import { Button } from "@/shared/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/components/ui/card"
+import { Input } from "@/shared/components/ui/input"
+import { Label } from "@/shared/components/ui/label"
+import { Separator } from "@/shared/components/ui/separator"
 import { WashingMachine, Eye, EyeOff, AlertCircle } from "lucide-react"
 import { GoogleLogin, type CredentialResponse } from "@react-oauth/google"
-import { getDashboardPath, login, loginWithGoogle } from "@/lib/auth"
-import { ApiError } from "@/lib/api"
-import { useToast } from "@/hooks/use-toast"
+import { getDashboardPath, login, loginWithGoogle } from "@/features/auth/api/auth-api"
+import { ApiError } from "@/shared/lib/api"
+import { useToast } from "@/shared/hooks/use-toast"
 
 export default function LoginPage() {
   const navigate = useNavigate()

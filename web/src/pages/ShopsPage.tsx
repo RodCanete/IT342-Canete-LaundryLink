@@ -1,6 +1,6 @@
-import { Navbar } from "@/components/navbar"
-import { Footer } from "@/components/footer"
-import { ShopListPage } from "@/components/shops/shop-list-page"
+import { Navbar } from "@/shared/components/navbar"
+import { Footer } from "@/shared/components/footer"
+import { ShopListPage } from "@/features/shops/components/shop-list-page"
 
 export default function ShopsPage() {
   return (

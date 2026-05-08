@@ -1,7 +1,7 @@
 import { useSearchParams } from "react-router-dom"
-import { Navbar } from "@/components/navbar"
-import { Footer } from "@/components/footer"
-import { BookingConfirmation } from "@/components/booking/booking-confirmation"
+import { Navbar } from "@/shared/components/navbar"
+import { Footer } from "@/shared/components/footer"
+import { BookingConfirmation } from "@/features/booking/components/booking-confirmation"
 
 export default function ConfirmationPage() {
   const [searchParams] = useSearchParams()

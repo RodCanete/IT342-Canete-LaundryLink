@@ -1,5 +1,5 @@
-import { DashboardGuard } from "@/components/auth/dashboard-guard"
-import { ScheduleManagement } from "@/components/shop-owner/schedule-management"
+import { DashboardGuard } from "@/features/auth/components/dashboard-guard"
+import { ScheduleManagement } from "@/features/shop-owner/components/schedule-management"
 
 export default function ShopOwnerSchedulePage() {
   return (

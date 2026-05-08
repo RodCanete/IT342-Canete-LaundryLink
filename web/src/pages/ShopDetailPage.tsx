@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom"
-import { Navbar } from "@/components/navbar"
-import { Footer } from "@/components/footer"
-import { ShopDetailView } from "@/components/shops/shop-detail-view"
+import { Navbar } from "@/shared/components/navbar"
+import { Footer } from "@/shared/components/footer"
+import { ShopDetailView } from "@/features/shops/components/shop-detail-view"
 
 export default function ShopDetailPage() {
   const { id } = useParams<{ id: string }>()

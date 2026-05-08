@@ -1,5 +1,5 @@
-import { DashboardGuard } from "@/components/auth/dashboard-guard"
-import { MyShopForm } from "@/components/shop-owner/my-shop"
+import { DashboardGuard } from "@/features/auth/components/dashboard-guard"
+import { MyShopForm } from "@/features/shop-owner/components/my-shop"
 
 export default function ShopOwnerShopPage() {
   return (

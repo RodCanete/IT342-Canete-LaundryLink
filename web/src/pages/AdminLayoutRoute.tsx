@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom"
-import { AdminLayout } from "@/components/admin/admin-layout"
-import { DashboardGuard } from "@/components/auth/dashboard-guard"
+import { AdminLayout } from "@/features/admin/components/admin-layout"
+import { DashboardGuard } from "@/features/auth/components/dashboard-guard"
 
 export default function AdminLayoutRoute() {
   return (

@@ -1,5 +1,5 @@
-import { DashboardGuard } from "@/components/auth/dashboard-guard"
-import { CustomerDashboard } from "@/components/customer/customer-dashboard"
+import { DashboardGuard } from "@/features/auth/components/dashboard-guard"
+import { CustomerDashboard } from "@/features/customer/components/customer-dashboard"
 
 export default function CustomerDashboardPage() {
   return (
