@@ -5,6 +5,7 @@ import edu.cit.canete.laundrylink.features.auth.adapter.GooglePayloadAdapter;
 import edu.cit.canete.laundrylink.features.auth.dto.GoogleOAuthRequest;
 import edu.cit.canete.laundrylink.features.auth.dto.LoginRequest;
 import edu.cit.canete.laundrylink.features.auth.dto.RegisterRequest;
+import edu.cit.canete.laundrylink.shared.notification.EmailService;
 import edu.cit.canete.laundrylink.shared.security.GoogleTokenVerifier;
 import edu.cit.canete.laundrylink.shared.security.JwtUtil;
 import edu.cit.canete.laundrylink.shared.user.User;
@@ -37,6 +38,9 @@ public class AuthService {
     @Autowired
     private GooglePayloadAdapter googlePayloadAdapter;
 
+    @Autowired
+    private EmailService emailService;
+
     public Map<String, Object> register(RegisterRequest req) {
         if (userRepository.existsByEmail(req.getEmail())) {
             throw new RuntimeException("Email already registered");
@@ -52,9 +56,10 @@ public class AuthService {
         user.setEmail(req.getEmail());
         user.setPasswordHash(encoder.encode(req.getPassword()));
         user.setRole(UserRole.normalizeForRegistration(req.getRole()));
-        userRepository.save(user);
+        User saved = userRepository.save(user);
 
-        return buildAuthResponse(user);
+        emailService.sendWelcomeEmail(saved.getEmail(), saved.getFirstName());
+        return buildAuthResponse(saved);
     }
 
     public Map<String, Object> login(LoginRequest req) {
@@ -109,7 +114,10 @@ public class AuthService {
 
         user.setFirstName(profile.firstName());
         user.setLastName(profile.lastName());
-        return userRepository.save(user);
+        User saved = userRepository.save(user);
+
+        emailService.sendWelcomeEmail(saved.getEmail(), saved.getFirstName());
+        return saved;
     }
 
     private Map<String, Object> buildAuthResponse(User user) {

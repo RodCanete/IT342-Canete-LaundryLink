@@ -3,11 +3,13 @@ package edu.cit.canete.laundrylink;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import java.nio.file.Path;
 import java.util.List;
 
 @SpringBootApplication
+@EnableAsync
 public class LaundrylinkApplication {
 
 	public static void main(String[] args) {

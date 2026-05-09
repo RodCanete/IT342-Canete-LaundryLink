@@ -4,8 +4,15 @@ import edu.cit.canete.laundrylink.features.booking.BookingRepository;
 import edu.cit.canete.laundrylink.features.slot.SlotConfig;
 import edu.cit.canete.laundrylink.features.slot.SlotConfigRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -29,6 +36,9 @@ public class ShopService {
     @Autowired
     private BookingRepository bookingRepository;
 
+    @Autowired
+    private RestTemplate restTemplate;
+
     public List<Shop> listShops() {
         return shopRepository.findAll();
     }
@@ -43,6 +53,26 @@ public class ShopService {
             throw new RuntimeException("Shop not found");
         }
         return serviceRepository.findByShop_Id(shopId);
+    }
+
+    public Map<String, BigDecimal> geocodeAddress(String address, String city) {
+        try {
+            String query = URLEncoder.encode(address + ", " + city, StandardCharsets.UTF_8);
+            String url = "https://nominatim.openstreetmap.org/search?q=" + query + "&format=json&limit=1";
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("User-Agent", "LaundryLink/1.0 (student-project)");
+            var response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), List.class);
+            if (response.getBody() != null && !response.getBody().isEmpty()) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> first = (Map<String, Object>) response.getBody().get(0);
+                BigDecimal lat = new BigDecimal(first.get("lat").toString());
+                BigDecimal lon = new BigDecimal(first.get("lon").toString());
+                return Map.of("latitude", lat, "longitude", lon);
+            }
+        } catch (Exception e) {
+            System.err.println("Geocoding failed for: " + address + ", " + city + " — " + e.getMessage());
+        }
+        return Map.of();
     }
 
     public List<Map<String, Object>> listShopsSummary(LocalDate date) {
