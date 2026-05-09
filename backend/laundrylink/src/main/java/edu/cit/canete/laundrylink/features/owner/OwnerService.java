@@ -7,6 +7,7 @@ import edu.cit.canete.laundrylink.features.shop.ServiceRepository;
 import edu.cit.canete.laundrylink.features.shop.ServiceType;
 import edu.cit.canete.laundrylink.features.shop.Shop;
 import edu.cit.canete.laundrylink.features.shop.ShopRepository;
+import edu.cit.canete.laundrylink.features.shop.ShopService;
 import edu.cit.canete.laundrylink.features.shop.dto.CreateServiceRequest;
 import edu.cit.canete.laundrylink.features.shop.dto.UpdateServiceRequest;
 import edu.cit.canete.laundrylink.features.shop.dto.UpdateShopRequest;
@@ -18,6 +19,7 @@ import edu.cit.canete.laundrylink.shared.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -41,6 +43,9 @@ public class OwnerService {
     @Autowired
     private BookingRepository bookingRepository;
 
+    @Autowired
+    private ShopService shopService;
+
     private Shop requireOwnedShop(User owner) {
         return shopRepository.findFirstByOwner_Id(owner.getId())
             .orElseThrow(() -> new RuntimeException("OWNER-001: No shop linked to this owner"));
@@ -56,9 +61,19 @@ public class OwnerService {
         shop.setName(req.getName());
         shop.setAddress(req.getAddress());
         shop.setCity(req.getCity());
-        shop.setLatitude(req.getLatitude());
-        shop.setLongitude(req.getLongitude());
         shop.setOperatingHours(req.getOperatingHours());
+
+        if (req.getLatitude() != null && req.getLongitude() != null) {
+            shop.setLatitude(req.getLatitude());
+            shop.setLongitude(req.getLongitude());
+        } else {
+            Map<String, BigDecimal> coords = shopService.geocodeAddress(req.getAddress(), req.getCity());
+            if (!coords.isEmpty()) {
+                shop.setLatitude(coords.get("latitude"));
+                shop.setLongitude(coords.get("longitude"));
+            }
+        }
+
         Shop saved = shopRepository.save(shop);
         return shopToMap(saved);
     }

@@ -4,6 +4,8 @@ import edu.cit.canete.laundrylink.features.auth.dto.GoogleOAuthRequest;
 import edu.cit.canete.laundrylink.features.auth.dto.LoginRequest;
 import edu.cit.canete.laundrylink.features.auth.dto.RegisterRequest;
 import edu.cit.canete.laundrylink.shared.web.ApiResponseFactory;
+import edu.cit.canete.laundrylink.shared.user.AuthenticatedUserService;
+import edu.cit.canete.laundrylink.shared.user.User;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,9 @@ public class AuthController {
 
     @Autowired
     private ApiResponseFactory responseFactory;
+
+    @Autowired
+    private AuthenticatedUserService authenticatedUserService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest req) {
@@ -61,5 +66,22 @@ public class AuthController {
         data.put("status", "healthy");
         data.put("service", "LaundryLink Auth");
         return responseFactory.successResponse(data, HttpStatus.OK);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> me(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        try {
+            User user = authenticatedUserService.requireUser(authHeader);
+            Map<String, Object> data = new java.util.HashMap<>();
+            data.put("id", user.getId());
+            data.put("firstName", user.getFirstName());
+            data.put("lastName", user.getLastName());
+            data.put("email", user.getEmail());
+            data.put("role", user.getRole());
+            data.put("oauthProvider", user.getOauthProvider());
+            return responseFactory.successResponse(data, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return responseFactory.errorResponse("AUTH-001", e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
     }
 }
