@@ -16,6 +16,9 @@ mobile/local.properties
 .claude/
 .superpowers/
 
+
+
+
 ###################
 # JAVA/MAVEN (Backend)
 ###################
@@ -29,6 +32,11 @@ backend/mvnw
 backend/mvnw.cmd
 
 md_Files/
+unpacked_gen/
+unpacked_report/
+unpacked_report1/
+unpacked_report2/
+
 
 # Spring Boot
 backend/application-*.properties
