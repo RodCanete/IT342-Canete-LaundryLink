@@ -56,8 +56,8 @@ class ShopListFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.state.collect { state ->
                 binding.progressBar.isVisible = state is ShopListState.Loading
-                binding.tvError.isVisible = state is ShopListState.Error
-                if (state is ShopListState.Error) binding.tvError.text = state.message
+                binding.errorBanner.root.isVisible = state is ShopListState.Error
+                if (state is ShopListState.Error) binding.errorBanner.tvError.text = state.message
                 if (state is ShopListState.Success) adapter.submitList(state.filtered)
             }
         }

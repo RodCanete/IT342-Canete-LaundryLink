@@ -1,6 +1,7 @@
 package edu.cit.canete.laundrylink.features.booking;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.cit.canete.laundrylink.shared.config.SecurityConfig;
 import edu.cit.canete.laundrylink.shared.web.ApiResponseFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
@@ -31,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Uses {@code @WebMvcTest} so only the web layer is loaded; no real database is needed.
  */
 @WebMvcTest(BookingController.class)
-@Import(ApiResponseFactory.class)
+@Import({ApiResponseFactory.class, SecurityConfig.class})
 class BookingControllerTest {
 
     @Autowired
@@ -101,6 +103,7 @@ class BookingControllerTest {
         when(bookingService.createBooking(any(), any())).thenReturn(VALID_BOOKING_MAP);
 
         mockMvc.perform(post("/api/bookings")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer valid.jwt.token")
                         .content(validCreateBookingBody()))
@@ -122,6 +125,7 @@ class BookingControllerTest {
                 .thenThrow(new RuntimeException("SLOT-002: Daily Priority slot limit reached"));
 
         mockMvc.perform(post("/api/bookings")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer valid.jwt.token")
                         .content(validCreateBookingBody()))
@@ -145,6 +149,7 @@ class BookingControllerTest {
                 """.formatted(SERVICE_ID);
 
         mockMvc.perform(post("/api/bookings")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer valid.jwt.token")
                         .content(body))

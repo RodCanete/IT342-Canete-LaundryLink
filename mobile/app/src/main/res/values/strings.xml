@@ -1,3 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">LaundryLink</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_find_shops">Find Shops</string>
+    <string name="nav_my_bookings">My Bookings</string>
+    <string name="action_logout">Log out</string>
+    <string name="login_title">Welcome Back</string>
+    <string name="login_subtitle">Log in to manage your bookings</string>
+    <string name="register_title">Create Account</string>
+    <string name="register_subtitle">Join LaundryLink today</string>
 </resources>

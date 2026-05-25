@@ -45,14 +45,11 @@ export default function LoginPage() {
         navigate(redirectPath)
       }, 1000)
     } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.message)
-      } else {
-        setError("An unexpected error occurred. Please try again.")
-      }
+      const message = err instanceof Error ? err.message : "An unexpected error occurred. Please try again."
+      setError(message)
       toast({
         title: "Login failed",
-        description: err instanceof ApiError ? err.message : "Please try again.",
+        description: message,
         variant: "destructive",
       })
     } finally {

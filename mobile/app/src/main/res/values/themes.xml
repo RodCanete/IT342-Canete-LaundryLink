@@ -1,5 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.LaundryLink" parent="Theme.Material3.DayNight.NoActionBar" />
+    <style name="Theme.LaundryLink" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/ll_primary</item>
+        <item name="colorOnPrimary">@color/ll_primary_foreground</item>
+        <item name="colorPrimaryContainer">@color/ll_primary_muted</item>
+        <item name="colorOnPrimaryContainer">@color/ll_primary</item>
+        <item name="colorSecondary">@color/ll_secondary</item>
+        <item name="colorOnSecondary">@color/ll_secondary_foreground</item>
+        <item name="colorTertiary">@color/ll_accent</item>
+        <item name="colorOnTertiary">@color/ll_accent_foreground</item>
+        <item name="colorSurface">@color/ll_card</item>
+        <item name="colorOnSurface">@color/ll_foreground</item>
+        <item name="colorSurfaceVariant">@color/ll_muted</item>
+        <item name="colorOnSurfaceVariant">@color/ll_muted_foreground</item>
+        <item name="android:colorBackground">@color/ll_background</item>
+        <item name="colorError">@color/ll_destructive</item>
+        <item name="colorOnError">@color/ll_destructive_foreground</item>
+        <item name="android:statusBarColor">@color/ll_card</item>
+        <item name="android:navigationBarColor">@color/ll_card</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="materialButtonStyle">@style/Widget.LaundryLink.Button.Primary</item>
+        <item name="textInputStyle">@style/Widget.LaundryLink.InputLayout</item>
+        <item name="materialCardViewStyle">@style/Widget.LaundryLink.Card</item>
+        <item name="bottomNavigationStyle">@style/Widget.LaundryLink.BottomNav</item>
+        <item name="fontFamily">@font/plus_jakarta_sans</item>
+    </style>
+
+    <style name="Widget.LaundryLink.BottomNav" parent="Widget.Material3.BottomNavigationView">
+        <item name="android:background">@color/ll_card</item>
+        <item name="itemIconTint">@color/bottom_nav_color</item>
+        <item name="itemTextColor">@color/bottom_nav_color</item>
+        <item name="itemRippleColor">@color/ll_primary_muted</item>
+    </style>
+
 </resources>

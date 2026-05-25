@@ -1,9 +1,10 @@
 package edu.cit.canete.laundrylink.features.booking.ui.adapter
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import edu.cit.canete.laundrylink.R
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -50,30 +51,27 @@ class BookingAdapter(
     }
 
     private fun applyStatusStyle(view: android.widget.TextView, status: String) {
+        val ctx = view.context
         when (status) {
             "PAID" -> {
-                view.setBackgroundColor(Color.parseColor("#DCFCE7"))
-                view.setTextColor(Color.parseColor("#166534"))
+                view.setBackgroundColor(ContextCompat.getColor(ctx, R.color.ll_success_muted))
+                view.setTextColor(ContextCompat.getColor(ctx, R.color.ll_success))
             }
             "PENDING_PAYMENT" -> {
-                view.setBackgroundColor(Color.parseColor("#FEF3C7"))
-                view.setTextColor(Color.parseColor("#92400E"))
+                view.setBackgroundColor(ContextCompat.getColor(ctx, R.color.ll_warning_muted))
+                view.setTextColor(ContextCompat.getColor(ctx, R.color.ll_warning))
             }
             "DROPPED_OFF" -> {
-                view.setBackgroundColor(Color.parseColor("#DBEAFE"))
-                view.setTextColor(Color.parseColor("#1E3A8A"))
+                view.setBackgroundColor(ContextCompat.getColor(ctx, R.color.ll_primary_muted))
+                view.setTextColor(ContextCompat.getColor(ctx, R.color.ll_primary))
             }
             "PROCESSING" -> {
-                view.setBackgroundColor(Color.parseColor("#E0E7FF"))
-                view.setTextColor(Color.parseColor("#3730A3"))
-            }
-            "COMPLETED" -> {
-                view.setBackgroundColor(Color.parseColor("#F3F4F6"))
-                view.setTextColor(Color.parseColor("#4B5563"))
+                view.setBackgroundColor(ContextCompat.getColor(ctx, R.color.ll_info_muted))
+                view.setTextColor(ContextCompat.getColor(ctx, R.color.ll_accent))
             }
             else -> {
-                view.setBackgroundColor(Color.parseColor("#F3F4F6"))
-                view.setTextColor(Color.parseColor("#4B5563"))
+                view.setBackgroundColor(ContextCompat.getColor(ctx, R.color.ll_muted))
+                view.setTextColor(ContextCompat.getColor(ctx, R.color.ll_muted_foreground))
             }
         }
     }

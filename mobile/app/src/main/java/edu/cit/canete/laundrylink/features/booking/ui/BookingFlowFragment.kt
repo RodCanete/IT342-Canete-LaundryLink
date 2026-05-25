@@ -2,7 +2,7 @@ package edu.cit.canete.laundrylink.features.booking.ui
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Color
+import androidx.core.content.ContextCompat
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
@@ -17,6 +17,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import edu.cit.canete.laundrylink.MainActivity
 import edu.cit.canete.laundrylink.R
 import edu.cit.canete.laundrylink.databinding.FragmentBookingFlowBinding
 import edu.cit.canete.laundrylink.features.booking.viewmodel.BookingFlowUiState
@@ -60,7 +61,7 @@ class BookingFlowFragment : Fragment() {
         binding.rvSlots.layoutManager = GridLayoutManager(requireContext(), 3)
         binding.rvSlots.adapter = slotAdapter
 
-        binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
+        (activity as? MainActivity)?.setDetailToolbarTitle("Book a Slot")
 
         binding.calendarView.minDate = System.currentTimeMillis() - 1_000
         binding.calendarView.setOnDateChangeListener { _, year, month, day ->
@@ -200,6 +201,7 @@ class BookingFlowFragment : Fragment() {
             binding.stepConnector1, binding.stepConnector2, binding.stepConnector3
         )
 
+        val ctx = requireContext()
         for (i in circles.indices) {
             val stepNum = i + 1
             val circle = circles[i]
@@ -207,29 +209,32 @@ class BookingFlowFragment : Fragment() {
             when {
                 stepNum < currentStep -> {
                     circle.setBackgroundResource(R.drawable.step_circle_completed)
-                    circle.setTextColor(Color.WHITE)
+                    circle.setTextColor(ContextCompat.getColor(ctx, R.color.ll_primary_foreground))
                     circle.text = "✓"
-                    label.setTextColor(Color.parseColor("#10B981"))
+                    label.setTextColor(ContextCompat.getColor(ctx, R.color.ll_success))
                 }
                 stepNum == currentStep -> {
                     circle.setBackgroundResource(R.drawable.step_circle_active)
-                    circle.setTextColor(Color.WHITE)
+                    circle.setTextColor(ContextCompat.getColor(ctx, R.color.ll_primary_foreground))
                     circle.text = stepNum.toString()
-                    label.setTextColor(Color.parseColor("#1F2937"))
+                    label.setTextColor(ContextCompat.getColor(ctx, R.color.ll_foreground))
                 }
                 else -> {
                     circle.setBackgroundResource(R.drawable.step_circle_inactive)
-                    circle.setTextColor(Color.parseColor("#9CA3AF"))
+                    circle.setTextColor(ContextCompat.getColor(ctx, R.color.ll_muted_foreground))
                     circle.text = stepNum.toString()
-                    label.setTextColor(Color.parseColor("#9CA3AF"))
+                    label.setTextColor(ContextCompat.getColor(ctx, R.color.ll_muted_foreground))
                 }
             }
         }
 
         connectors.forEachIndexed { idx, view ->
             view.setBackgroundColor(
-                if (idx + 1 < currentStep) Color.parseColor("#10B981")
-                else Color.parseColor("#E5E7EB")
+                if (idx + 1 < currentStep) {
+                    ContextCompat.getColor(ctx, R.color.ll_success)
+                } else {
+                    ContextCompat.getColor(ctx, R.color.ll_border)
+                }
             )
         }
     }

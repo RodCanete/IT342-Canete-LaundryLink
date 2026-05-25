@@ -39,7 +39,7 @@ class LoginFragment : Fragment() {
                     is AuthState.Loading -> {
                         binding.btnLogin.isEnabled = false
                         binding.progressBar.visibility = View.VISIBLE
-                        binding.tvError.visibility = View.GONE
+                        binding.errorBanner.root.visibility = View.GONE
                     }
                     is AuthState.Success -> {
                         binding.progressBar.visibility = View.GONE
@@ -54,8 +54,8 @@ class LoginFragment : Fragment() {
                     is AuthState.Error -> {
                         binding.btnLogin.isEnabled = true
                         binding.progressBar.visibility = View.GONE
-                        binding.tvError.text = state.message
-                        binding.tvError.visibility = View.VISIBLE
+                        binding.errorBanner.tvError.text = state.message
+                        binding.errorBanner.root.visibility = View.VISIBLE
                     }
                     is AuthState.Idle -> {
                         binding.btnLogin.isEnabled = true
@@ -69,16 +69,16 @@ class LoginFragment : Fragment() {
             val email = binding.etEmail.text.toString().trim()
             val password = binding.etPassword.text.toString()
 
-            binding.tvError.visibility = View.GONE
+            binding.errorBanner.root.visibility = View.GONE
 
             when {
                 email.isBlank() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> {
-                    binding.tvError.text = "Enter a valid email address"
-                    binding.tvError.visibility = View.VISIBLE
+                    binding.errorBanner.tvError.text = "Enter a valid email address"
+                    binding.errorBanner.root.visibility = View.VISIBLE
                 }
                 password.isBlank() -> {
-                    binding.tvError.text = "Password is required"
-                    binding.tvError.visibility = View.VISIBLE
+                    binding.errorBanner.tvError.text = "Password is required"
+                    binding.errorBanner.root.visibility = View.VISIBLE
                 }
                 else -> viewModel.login(email, password)
             }

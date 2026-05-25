@@ -5,6 +5,7 @@ import edu.cit.canete.laundrylink.features.auth.adapter.GoogleOAuthProfile;
 import edu.cit.canete.laundrylink.features.auth.adapter.GooglePayloadAdapter;
 import edu.cit.canete.laundrylink.features.auth.dto.GoogleOAuthRequest;
 import edu.cit.canete.laundrylink.features.auth.dto.RegisterRequest;
+import edu.cit.canete.laundrylink.shared.notification.EmailService;
 import edu.cit.canete.laundrylink.shared.security.GoogleTokenVerifier;
 import edu.cit.canete.laundrylink.shared.security.JwtUtil;
 import edu.cit.canete.laundrylink.shared.user.User;
@@ -42,6 +43,9 @@ class AuthServiceTests {
 
     @Mock
     private GooglePayloadAdapter googlePayloadAdapter;
+
+    @Mock
+    private EmailService emailService;
 
     @InjectMocks
     private AuthService authService;

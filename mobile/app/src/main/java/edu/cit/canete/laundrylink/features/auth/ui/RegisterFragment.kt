@@ -39,7 +39,7 @@ class RegisterFragment : Fragment() {
                     is AuthState.Loading -> {
                         binding.btnRegister.isEnabled = false
                         binding.progressBar.visibility = View.VISIBLE
-                        binding.tvError.visibility = View.GONE
+                        binding.errorBanner.root.visibility = View.GONE
                     }
                     is AuthState.Success -> {
                         binding.progressBar.visibility = View.GONE
@@ -54,8 +54,8 @@ class RegisterFragment : Fragment() {
                     is AuthState.Error -> {
                         binding.btnRegister.isEnabled = true
                         binding.progressBar.visibility = View.GONE
-                        binding.tvError.text = state.message
-                        binding.tvError.visibility = View.VISIBLE
+                        binding.errorBanner.tvError.text = state.message
+                        binding.errorBanner.root.visibility = View.VISIBLE
                     }
                     is AuthState.Idle -> {
                         binding.btnRegister.isEnabled = true
@@ -72,24 +72,24 @@ class RegisterFragment : Fragment() {
             val password = binding.etPassword.text.toString()
             val confirmPass = binding.etConfirmPassword.text.toString()
 
-            binding.tvError.visibility = View.GONE
+            binding.errorBanner.root.visibility = View.GONE
 
             when {
                 firstName.isBlank() || lastName.isBlank() -> {
-                    binding.tvError.text = "First name and last name are required"
-                    binding.tvError.visibility = View.VISIBLE
+                    binding.errorBanner.tvError.text = "First name and last name are required"
+                    binding.errorBanner.root.visibility = View.VISIBLE
                 }
                 email.isBlank() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> {
-                    binding.tvError.text = "Enter a valid email address"
-                    binding.tvError.visibility = View.VISIBLE
+                    binding.errorBanner.tvError.text = "Enter a valid email address"
+                    binding.errorBanner.root.visibility = View.VISIBLE
                 }
                 password.length < 8 -> {
-                    binding.tvError.text = "Password must be at least 8 characters"
-                    binding.tvError.visibility = View.VISIBLE
+                    binding.errorBanner.tvError.text = "Password must be at least 8 characters"
+                    binding.errorBanner.root.visibility = View.VISIBLE
                 }
                 password != confirmPass -> {
-                    binding.tvError.text = "Passwords do not match"
-                    binding.tvError.visibility = View.VISIBLE
+                    binding.errorBanner.tvError.text = "Passwords do not match"
+                    binding.errorBanner.root.visibility = View.VISIBLE
                 }
                 else -> viewModel.register(firstName, lastName, email, password)
             }
