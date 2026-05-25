@@ -1,5 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  LaundryLink design tokens — sRGB hex from web/styles/globals.css (Clean Blue OKLCH theme).
+-->
 <resources>
+    <color name="ll_background">#EEFBFF</color>
+    <color name="ll_foreground">#060A13</color>
+    <color name="ll_card">#F9FEFF</color>
+    <color name="ll_card_foreground">#060A13</color>
+    <color name="ll_primary">#215BF2</color>
+    <color name="ll_primary_foreground">#FCFCFC</color>
+    <color name="ll_primary_muted">#D9EBFE</color>
+    <color name="ll_secondary">#DAF2FA</color>
+    <color name="ll_secondary_foreground">#192236</color>
+    <color name="ll_muted">#E2F2F7</color>
+    <color name="ll_muted_foreground">#51686F</color>
+    <color name="ll_accent">#009ECF</color>
+    <color name="ll_accent_foreground">#FCFCFC</color>
+    <color name="ll_border">#D2E5EC</color>
+    <color name="ll_input">#D2E5EC</color>
+    <color name="ll_ring">#5588FB</color>
+    <color name="ll_destructive">#E40016</color>
+    <color name="ll_destructive_foreground">#FCFCFC</color>
+    <color name="ll_destructive_muted">#EDE2E8</color>
+    <color name="ll_success">#1B8C2D</color>
+    <color name="ll_success_muted">#D9F0EA</color>
+    <color name="ll_warning">#CB7900</color>
+    <color name="ll_warning_muted">#F5EDD8</color>
+    <color name="ll_info">#009ECF</color>
+    <color name="ll_info_muted">#D9F2FA</color>
+
+    <!-- Legacy aliases for Material theme wiring -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>

@@ -4,17 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F8FAFC">
-
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="#1E40AF"
-        app:title="Book a Slot"
-        app:titleTextColor="#FFFFFF"
-        app:navigationIcon="@drawable/ic_arrow_back"
-        app:navigationIconTint="#FFFFFF" />
+    android:background="@color/ll_background">
 
     <!-- Header card with shop + service -->
     <LinearLayout
@@ -22,14 +12,14 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp"
-        android:background="#FFFFFF">
+        android:background="@color/ll_card">
 
         <TextView
             android:id="@+id/tvHeaderTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Book a Slot"
-            android:textColor="#1F2937"
+            android:textColor="@color/ll_foreground"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -38,7 +28,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:textColor="#6B7280"
+            android:textColor="@color/ll_muted_foreground"
             android:textSize="13sp" />
     </LinearLayout>
 
@@ -50,7 +40,7 @@
         android:orientation="horizontal"
         android:padding="16dp"
         android:gravity="center_vertical"
-        android:background="#FFFFFF">
+        android:background="@color/ll_card">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -65,7 +55,7 @@
                 android:layout_height="36dp"
                 android:gravity="center"
                 android:text="1"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/ll_card"
                 android:textStyle="bold"
                 android:background="@drawable/step_circle_active" />
 
@@ -75,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="Date"
-                android:textColor="#1F2937"
+                android:textColor="@color/ll_foreground"
                 android:textSize="11sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -86,7 +76,7 @@
             android:layout_height="2dp"
             android:layout_weight="1"
             android:layout_marginTop="-16dp"
-            android:background="#E5E7EB" />
+            android:background="@color/ll_border" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -101,7 +91,7 @@
                 android:layout_height="36dp"
                 android:gravity="center"
                 android:text="2"
-                android:textColor="#9CA3AF"
+                android:textColor="@color/ll_muted_foreground"
                 android:textStyle="bold"
                 android:background="@drawable/step_circle_inactive" />
 
@@ -111,7 +101,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="Time"
-                android:textColor="#9CA3AF"
+                android:textColor="@color/ll_muted_foreground"
                 android:textSize="11sp" />
         </LinearLayout>
 
@@ -121,7 +111,7 @@
             android:layout_height="2dp"
             android:layout_weight="1"
             android:layout_marginTop="-16dp"
-            android:background="#E5E7EB" />
+            android:background="@color/ll_border" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -136,7 +126,7 @@
                 android:layout_height="36dp"
                 android:gravity="center"
                 android:text="3"
-                android:textColor="#9CA3AF"
+                android:textColor="@color/ll_muted_foreground"
                 android:textStyle="bold"
                 android:background="@drawable/step_circle_inactive" />
 
@@ -146,7 +136,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="Upload"
-                android:textColor="#9CA3AF"
+                android:textColor="@color/ll_muted_foreground"
                 android:textSize="11sp" />
         </LinearLayout>
 
@@ -156,7 +146,7 @@
             android:layout_height="2dp"
             android:layout_weight="1"
             android:layout_marginTop="-16dp"
-            android:background="#E5E7EB" />
+            android:background="@color/ll_border" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -171,7 +161,7 @@
                 android:layout_height="36dp"
                 android:gravity="center"
                 android:text="4"
-                android:textColor="#9CA3AF"
+                android:textColor="@color/ll_muted_foreground"
                 android:textStyle="bold"
                 android:background="@drawable/step_circle_inactive" />
 
@@ -181,7 +171,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="Summary"
-                android:textColor="#9CA3AF"
+                android:textColor="@color/ll_muted_foreground"
                 android:textSize="11sp" />
         </LinearLayout>
     </LinearLayout>
@@ -223,7 +213,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="Select a Date"
-                        android:textColor="#1F2937"
+                        android:textColor="@color/ll_foreground"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -233,7 +223,7 @@
                         android:gravity="center"
                         android:layout_marginTop="2dp"
                         android:text="Choose your preferred drop-off date"
-                        android:textColor="#6B7280"
+                        android:textColor="@color/ll_muted_foreground"
                         android:textSize="12sp" />
 
                     <CalendarView
@@ -248,7 +238,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:layout_marginTop="8dp"
-                        android:textColor="#1E40AF"
+                        android:textColor="@color/ll_primary"
                         android:textSize="13sp"
                         android:textStyle="bold"
                         android:visibility="gone" />
@@ -275,7 +265,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="Select a Time Slot"
-                        android:textColor="#1F2937"
+                        android:textColor="@color/ll_foreground"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -285,7 +275,7 @@
                         android:gravity="center"
                         android:layout_marginTop="2dp"
                         android:text="Choose an available time slot"
-                        android:textColor="#6B7280"
+                        android:textColor="@color/ll_muted_foreground"
                         android:textSize="12sp" />
 
                     <ProgressBar
@@ -303,9 +293,9 @@
                         android:layout_marginTop="16dp"
                         android:padding="16dp"
                         android:gravity="center"
-                        android:background="#F3F4F6"
+                        android:background="@color/ll_muted"
                         android:text="No slots available for the selected date."
-                        android:textColor="#6B7280"
+                        android:textColor="@color/ll_muted_foreground"
                         android:textSize="13sp"
                         android:visibility="gone" />
 
@@ -339,7 +329,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="Upload Instructions"
-                        android:textColor="#1F2937"
+                        android:textColor="@color/ll_foreground"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -349,7 +339,7 @@
                         android:gravity="center"
                         android:layout_marginTop="2dp"
                         android:text="Optional: pick a file to bring with your laundry"
-                        android:textColor="#6B7280"
+                        android:textColor="@color/ll_muted_foreground"
                         android:textSize="12sp" />
 
                     <com.google.android.material.button.MaterialButton
@@ -359,10 +349,10 @@
                         android:layout_height="50dp"
                         android:layout_marginTop="16dp"
                         android:text="Choose File (JPG/PNG/PDF)"
-                        android:textColor="#1E40AF"
+                        android:textColor="@color/ll_primary"
                         android:textSize="14sp"
                         android:textStyle="bold"
-                        app:strokeColor="#1E40AF"
+                        app:strokeColor="@color/ll_primary"
                         app:strokeWidth="1dp"
                         app:cornerRadius="10dp" />
 
@@ -371,7 +361,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:textColor="#1E40AF"
+                        android:textColor="@color/ll_primary"
                         android:textSize="13sp"
                         android:visibility="gone" />
 
@@ -380,9 +370,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
                         android:padding="12dp"
-                        android:background="#FEF3C7"
+                        android:background="@color/ll_warning_muted"
                         android:text="Note: bring this file with you to the shop. Mobile attachments are not uploaded yet."
-                        android:textColor="#92400E"
+                        android:textColor="@color/ll_warning"
                         android:textSize="12sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -407,7 +397,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="Booking Summary"
-                        android:textColor="#1F2937"
+                        android:textColor="@color/ll_foreground"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -417,7 +407,7 @@
                         android:gravity="center"
                         android:layout_marginTop="2dp"
                         android:text="Review your booking details"
-                        android:textColor="#6B7280"
+                        android:textColor="@color/ll_muted_foreground"
                         android:textSize="12sp" />
 
                     <LinearLayout
@@ -426,13 +416,13 @@
                         android:orientation="vertical"
                         android:layout_marginTop="16dp"
                         android:padding="16dp"
-                        android:background="#F9FAFB">
+                        android:background="@color/ll_muted">
 
                         <TextView
                             android:id="@+id/tvSummaryShop"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textColor="#1F2937"
+                            android:textColor="@color/ll_foreground"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
@@ -441,14 +431,14 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:textColor="#6B7280"
+                            android:textColor="@color/ll_muted_foreground"
                             android:textSize="12sp" />
 
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
                             android:layout_marginVertical="12dp"
-                            android:background="#E5E7EB" />
+                            android:background="@color/ll_border" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -460,14 +450,14 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:text="Service"
-                                android:textColor="#6B7280"
+                                android:textColor="@color/ll_muted_foreground"
                                 android:textSize="13sp" />
 
                             <TextView
                                 android:id="@+id/tvSummaryService"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="#1F2937"
+                                android:textColor="@color/ll_foreground"
                                 android:textSize="13sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
@@ -483,14 +473,14 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:text="Date"
-                                android:textColor="#6B7280"
+                                android:textColor="@color/ll_muted_foreground"
                                 android:textSize="13sp" />
 
                             <TextView
                                 android:id="@+id/tvSummaryDate"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="#1F2937"
+                                android:textColor="@color/ll_foreground"
                                 android:textSize="13sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
@@ -506,14 +496,14 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:text="Time"
-                                android:textColor="#6B7280"
+                                android:textColor="@color/ll_muted_foreground"
                                 android:textSize="13sp" />
 
                             <TextView
                                 android:id="@+id/tvSummaryTime"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="#1F2937"
+                                android:textColor="@color/ll_foreground"
                                 android:textSize="13sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
@@ -529,7 +519,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:text="Attached"
-                                android:textColor="#6B7280"
+                                android:textColor="@color/ll_muted_foreground"
                                 android:textSize="13sp" />
 
                             <TextView
@@ -537,7 +527,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="None"
-                                android:textColor="#1F2937"
+                                android:textColor="@color/ll_foreground"
                                 android:textSize="13sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
@@ -546,7 +536,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
                             android:layout_marginVertical="12dp"
-                            android:background="#E5E7EB" />
+                            android:background="@color/ll_border" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -558,7 +548,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:text="Total"
-                                android:textColor="#1F2937"
+                                android:textColor="@color/ll_foreground"
                                 android:textSize="15sp"
                                 android:textStyle="bold" />
 
@@ -566,7 +556,7 @@
                                 android:id="@+id/tvSummaryPrice"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="#1E40AF"
+                                android:textColor="@color/ll_primary"
                                 android:textSize="15sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
@@ -578,8 +568,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
                         android:padding="12dp"
-                        android:background="#FEE2E2"
-                        android:textColor="#B91C1C"
+                        android:background="@color/ll_destructive_muted"
+                        android:textColor="@color/ll_destructive"
                         android:textSize="13sp"
                         android:visibility="gone" />
 
@@ -603,7 +593,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="16dp"
-        android:background="#FFFFFF">
+        android:background="@color/ll_card">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnBack"
@@ -613,10 +603,10 @@
             android:layout_weight="1"
             android:layout_marginEnd="6dp"
             android:text="Back"
-            android:textColor="#1E40AF"
+            android:textColor="@color/ll_primary"
             android:textSize="14sp"
             android:textStyle="bold"
-            app:strokeColor="#1E40AF"
+            app:strokeColor="@color/ll_primary"
             app:strokeWidth="1dp"
             app:cornerRadius="10dp" />
 
@@ -626,9 +616,9 @@
             android:layout_height="50dp"
             android:layout_weight="1"
             android:layout_marginStart="6dp"
-            android:backgroundTint="#1E40AF"
+            android:backgroundTint="@color/ll_primary"
             android:text="Next"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/ll_card"
             android:textSize="14sp"
             android:textStyle="bold"
             app:cornerRadius="10dp" />

@@ -2,7 +2,6 @@ package edu.cit.canete.laundrylink.features.booking.ui
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.util.Base64
@@ -12,7 +11,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import edu.cit.canete.laundrylink.MainActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -47,7 +48,7 @@ class BookingConfirmationFragment : Fragment() {
         }
         bookingId = id
 
-        binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
+        (activity as? MainActivity)?.setDetailToolbarTitle("Booking Confirmation")
 
         viewModel.load(id)
         viewModel.startPaymentStatusPolling(id)
@@ -73,8 +74,8 @@ class BookingConfirmationFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.state.collect { state ->
                 binding.progressBar.isVisible = state.loading
-                binding.tvError.isVisible = !state.error.isNullOrBlank()
-                binding.tvError.text = state.error ?: ""
+                binding.errorBanner.root.isVisible = !state.error.isNullOrBlank()
+                binding.errorBanner.tvError.text = state.error ?: ""
 
                 state.booking?.let { booking ->
                     binding.tvBookingCode.text = booking.bookingCode
@@ -130,30 +131,27 @@ class BookingConfirmationFragment : Fragment() {
     }
 
     private fun applyStatusStyle(view: TextView, status: String) {
+        val ctx = requireContext()
         when (status) {
             "PAID" -> {
-                view.setBackgroundColor(Color.parseColor("#DCFCE7"))
-                view.setTextColor(Color.parseColor("#166534"))
+                view.setBackgroundColor(ContextCompat.getColor(ctx, R.color.ll_success_muted))
+                view.setTextColor(ContextCompat.getColor(ctx, R.color.ll_success))
             }
             "PENDING_PAYMENT" -> {
-                view.setBackgroundColor(Color.parseColor("#FEF3C7"))
-                view.setTextColor(Color.parseColor("#92400E"))
+                view.setBackgroundColor(ContextCompat.getColor(ctx, R.color.ll_warning_muted))
+                view.setTextColor(ContextCompat.getColor(ctx, R.color.ll_warning))
             }
             "DROPPED_OFF" -> {
-                view.setBackgroundColor(Color.parseColor("#DBEAFE"))
-                view.setTextColor(Color.parseColor("#1E3A8A"))
+                view.setBackgroundColor(ContextCompat.getColor(ctx, R.color.ll_primary_muted))
+                view.setTextColor(ContextCompat.getColor(ctx, R.color.ll_primary))
             }
             "PROCESSING" -> {
-                view.setBackgroundColor(Color.parseColor("#E0E7FF"))
-                view.setTextColor(Color.parseColor("#3730A3"))
-            }
-            "COMPLETED" -> {
-                view.setBackgroundColor(Color.parseColor("#F3F4F6"))
-                view.setTextColor(Color.parseColor("#4B5563"))
+                view.setBackgroundColor(ContextCompat.getColor(ctx, R.color.ll_info_muted))
+                view.setTextColor(ContextCompat.getColor(ctx, R.color.ll_accent))
             }
             else -> {
-                view.setBackgroundColor(Color.parseColor("#F3F4F6"))
-                view.setTextColor(Color.parseColor("#4B5563"))
+                view.setBackgroundColor(ContextCompat.getColor(ctx, R.color.ll_muted))
+                view.setTextColor(ContextCompat.getColor(ctx, R.color.ll_muted_foreground))
             }
         }
     }

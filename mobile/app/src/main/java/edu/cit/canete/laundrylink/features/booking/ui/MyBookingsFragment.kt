@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -37,8 +38,6 @@ class MyBookingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
-
         adapter = BookingAdapter(
             onClick = { display -> openConfirmation(display) },
             onActionClick = { display -> handleAction(display) }
@@ -47,7 +46,7 @@ class MyBookingsFragment : Fragment() {
         binding.rvBookings.adapter = adapter
 
         binding.swipeRefresh.setColorSchemeColors(
-            android.graphics.Color.parseColor("#1E40AF")
+            ContextCompat.getColor(requireContext(), R.color.ll_primary)
         )
         binding.swipeRefresh.setOnRefreshListener { viewModel.load() }
 
@@ -61,8 +60,8 @@ class MyBookingsFragment : Fragment() {
                 binding.progressBar.isVisible = state.loading
                 binding.swipeRefresh.isRefreshing = state.refreshing
 
-                binding.tvError.isVisible = !state.error.isNullOrBlank()
-                binding.tvError.text = state.error ?: ""
+                binding.errorBanner.root.isVisible = !state.error.isNullOrBlank()
+                binding.errorBanner.tvError.text = state.error ?: ""
 
                 adapter.submitList(state.filtered)
 

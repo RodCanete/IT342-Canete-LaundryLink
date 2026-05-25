@@ -1,6 +1,8 @@
 package edu.cit.canete.laundrylink.features.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.cit.canete.laundrylink.shared.config.SecurityConfig;
+import edu.cit.canete.laundrylink.shared.user.AuthenticatedUserService;
 import edu.cit.canete.laundrylink.shared.web.ApiResponseFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * mock authentication token is required for these tests.
  */
 @WebMvcTest(AuthController.class)
-@Import(ApiResponseFactory.class)
+@Import({ApiResponseFactory.class, SecurityConfig.class})
 class AuthControllerTest {
 
     @Autowired
@@ -39,6 +41,9 @@ class AuthControllerTest {
 
     @MockBean
     private AuthService authService;
+
+    @MockBean
+    private AuthenticatedUserService authenticatedUserService;
 
     // ------------------------------------------------------------------
     // Helpers

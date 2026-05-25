@@ -14,7 +14,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.cit.canete.laundrylink.R
 import edu.cit.canete.laundrylink.databinding.FragmentHomeBinding
-import edu.cit.canete.laundrylink.features.auth.viewmodel.AuthViewModel
 import edu.cit.canete.laundrylink.features.shop.ui.adapter.ShopAdapter
 import edu.cit.canete.laundrylink.features.shop.viewmodel.ShopListState
 import edu.cit.canete.laundrylink.features.shop.viewmodel.ShopListViewModel
@@ -25,7 +24,6 @@ class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-    private val authViewModel: AuthViewModel by viewModels()
     private val shopViewModel: ShopListViewModel by viewModels()
     private lateinit var shopAdapter: ShopAdapter
 
@@ -42,17 +40,6 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         try {
             val tokenManager = TokenManager(requireContext())
-
-            binding.toolbar.setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    R.id.action_logout -> {
-                        authViewModel.logout()
-                        findNavController().navigate(R.id.action_home_to_login)
-                        true
-                    }
-                    else -> false
-                }
-            }
 
             viewLifecycleOwner.lifecycleScope.launch {
                 tokenManager.getUserName().collect { name ->

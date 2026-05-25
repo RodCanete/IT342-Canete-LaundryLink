@@ -1,11 +1,12 @@
 package edu.cit.canete.laundrylink.features.shop.ui.adapter
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import edu.cit.canete.laundrylink.R
 import edu.cit.canete.laundrylink.databinding.ItemSlotBinding
 import edu.cit.canete.laundrylink.features.shop.data.model.Slot
 
@@ -33,17 +34,17 @@ class SlotAdapter(
 
             val context = holder.itemView.context
             if (isSelected) {
-                cardSlot.strokeColor = Color.parseColor("#1E40AF")
+                cardSlot.strokeColor = ContextCompat.getColor(context, R.color.ll_primary)
                 cardSlot.strokeWidth = (3 * context.resources.displayMetrics.density).toInt()
-                cardSlot.setCardBackgroundColor(Color.parseColor("#1E40AF"))
-                tvSlotTime.setTextColor(Color.WHITE)
-                tvSlotAvailable.setTextColor(Color.parseColor("#DBEAFE"))
+                cardSlot.setCardBackgroundColor(ContextCompat.getColor(context, R.color.ll_primary))
+                tvSlotTime.setTextColor(ContextCompat.getColor(context, R.color.ll_primary_foreground))
+                tvSlotAvailable.setTextColor(ContextCompat.getColor(context, R.color.ll_primary_muted))
             } else {
-                cardSlot.strokeColor = Color.parseColor("#E5E7EB")
+                cardSlot.strokeColor = ContextCompat.getColor(context, R.color.ll_border)
                 cardSlot.strokeWidth = (1 * context.resources.displayMetrics.density).toInt()
-                cardSlot.setCardBackgroundColor(Color.WHITE)
-                tvSlotTime.setTextColor(Color.parseColor("#1F2937"))
-                tvSlotAvailable.setTextColor(Color.parseColor("#6B7280"))
+                cardSlot.setCardBackgroundColor(ContextCompat.getColor(context, R.color.ll_card))
+                tvSlotTime.setTextColor(ContextCompat.getColor(context, R.color.ll_foreground))
+                tvSlotAvailable.setTextColor(ContextCompat.getColor(context, R.color.ll_muted_foreground))
             }
 
             cardSlot.setOnClickListener {

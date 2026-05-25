@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="TextAppearance.LaundryLink" parent="TextAppearance.Material3.BodyMedium" />
+
+    <style name="TextAppearance.LaundryLink.Display" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/ll_foreground</item>
+        <item name="android:letterSpacing">-0.02</item>
+    </style>
+
+    <style name="TextAppearance.LaundryLink.Title" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/ll_foreground</item>
+    </style>
+
+    <style name="TextAppearance.LaundryLink.Subtitle" parent="TextAppearance.Material3.TitleSmall">
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/ll_foreground</item>
+    </style>
+
+    <style name="TextAppearance.LaundryLink.Body" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/ll_foreground</item>
+    </style>
+
+    <style name="TextAppearance.LaundryLink.Caption" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/ll_muted_foreground</item>
+    </style>
+
+    <style name="TextAppearance.LaundryLink.Label" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:fontFamily">@font/plus_jakarta_sans</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/ll_muted_foreground</item>
+    </style>
+
+    <style name="TextAppearance.LaundryLink.OnPrimary" parent="TextAppearance.LaundryLink.Body">
+        <item name="android:textColor">@color/ll_primary_foreground</item>
+    </style>
+
+    <style name="TextAppearance.LaundryLink.OnPrimaryMuted" parent="TextAppearance.LaundryLink.Caption">
+        <item name="android:textColor">#B3C4FC</item>
+    </style>
+</resources>

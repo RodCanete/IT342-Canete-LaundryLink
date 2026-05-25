@@ -4,35 +4,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#F8FAFC">
-
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="#1E40AF"
-        app:title="Find a Shop"
-        app:titleTextColor="#FFFFFF"
-        app:navigationIcon="@drawable/ic_arrow_back"
-        app:navigationIconTint="#FFFFFF" />
+    android:background="@color/ll_background"
+    android:orientation="vertical">
 
     <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.LaundryLink.InputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="12dp"
-        app:boxBackgroundColor="#FFFFFF"
+        android:layout_margin="@dimen/spacing_4"
         app:hintEnabled="false"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+        app:startIconDrawable="@drawable/ic_nav_shops"
+        app:startIconTint="@color/ll_muted_foreground">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etSearch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/plus_jakarta_sans"
             android:hint="Search shops..."
             android:imeOptions="actionSearch"
             android:singleLine="true" />
-
     </com.google.android.material.textfield.TextInputLayout>
 
     <ProgressBar
@@ -40,19 +31,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="@dimen/spacing_8"
+        android:indeterminateTint="@color/ll_primary"
         android:visibility="gone" />
 
-    <TextView
-        android:id="@+id/tvError"
+    <include
+        android:id="@+id/errorBanner"
+        layout="@layout/include_error_banner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="12dp"
-        android:padding="12dp"
-        android:background="#FEE2E2"
-        android:textColor="#B91C1C"
-        android:textSize="13sp"
-        android:visibility="gone" />
+        android:layout_marginHorizontal="@dimen/spacing_4" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvShops"
@@ -60,6 +48,5 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:clipToPadding="false"
-        android:paddingBottom="12dp" />
-
+        android:paddingBottom="@dimen/spacing_3" />
 </LinearLayout>

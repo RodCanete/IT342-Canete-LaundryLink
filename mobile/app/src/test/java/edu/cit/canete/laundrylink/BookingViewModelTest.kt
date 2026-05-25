@@ -1,6 +1,8 @@
 package edu.cit.canete.laundrylink
 
+import android.content.Context
 import edu.cit.canete.laundrylink.features.booking.data.BookingRepository
+import edu.cit.canete.laundrylink.shared.network.RetrofitClient
 import edu.cit.canete.laundrylink.features.booking.data.model.Booking
 import edu.cit.canete.laundrylink.features.booking.viewmodel.BookingFlowUiState
 import edu.cit.canete.laundrylink.features.booking.viewmodel.BookingViewModel
@@ -100,6 +102,7 @@ class BookingViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
+        RetrofitClient.init(mockk<Context>(relaxed = true))
         mockShopRepo = mockk()
         mockBookingRepo = mockk()
 

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Lucide "washing-machine" — matches web Navbar / auth logo -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M5,4h14a2,2 0,0,1 2,2v16a2,2 0,0,1 -2,2H5a2,2 0,0,1 -2,-2V6a2,2 0,0,1 2,-2z"
+        android:strokeWidth="2"
+        android:strokeColor="@color/ll_primary_foreground"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M12,8a5,5 0,1,1 0,10a5,5 0,1,1 0,-10"
+        android:strokeWidth="2"
+        android:strokeColor="@color/ll_primary_foreground"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M3,6h3"
+        android:strokeWidth="2"
+        android:strokeColor="@color/ll_primary_foreground"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <path
+        android:fillColor="@color/ll_primary_foreground"
+        android:pathData="M17,5.5a0.5,0.5 0,1,1 0,1a0.5,0.5 0,1,1 0,-1" />
+
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M12,18a2.5,2.5 0,0,0 0,-5a2.5,2.5 0,0,1 0,-5"
+        android:strokeWidth="2"
+        android:strokeColor="@color/ll_primary_foreground"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

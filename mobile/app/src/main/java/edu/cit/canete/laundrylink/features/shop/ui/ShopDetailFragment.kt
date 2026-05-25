@@ -1,6 +1,5 @@
 package edu.cit.canete.laundrylink.features.shop.ui
 
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
@@ -9,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -17,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
+import edu.cit.canete.laundrylink.MainActivity
 import edu.cit.canete.laundrylink.R
 import edu.cit.canete.laundrylink.databinding.FragmentShopDetailBinding
 import edu.cit.canete.laundrylink.features.shop.data.model.Service
@@ -45,17 +46,16 @@ class ShopDetailFragment : Fragment() {
             return
         }
 
-        binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
         viewModel.load(shopId)
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.state.collect { state ->
                 binding.progressBar.isVisible = state.loading
-                binding.tvError.isVisible = !state.error.isNullOrBlank()
-                binding.tvError.text = state.error ?: ""
+                binding.errorBanner.root.isVisible = !state.error.isNullOrBlank()
+                binding.errorBanner.tvError.text = state.error ?: ""
 
                 state.shop?.let { shop ->
-                    binding.toolbar.title = shop.name
+                    (activity as? MainActivity)?.setDetailToolbarTitle(shop.name)
                     binding.tvShopName.text = shop.name
                     binding.tvAddress.text = shop.address
                     binding.tvHours.text = shop.operatingHours ?: ""
@@ -80,11 +80,12 @@ class ShopDetailFragment : Fragment() {
                 ViewGroup.LayoutParams.WRAP_CONTENT
             ).apply {
                 topMargin = dp(8)
-                bottomMargin = dp(0)
             }
-            radius = dp(14).toFloat()
-            cardElevation = dp(2).toFloat()
-            setCardBackgroundColor(Color.WHITE)
+            radius = resources.getDimension(R.dimen.radius_xl)
+            cardElevation = resources.getDimension(R.dimen.card_elevation)
+            setCardBackgroundColor(ContextCompat.getColor(ctx, R.color.ll_card))
+            strokeColor = ContextCompat.getColor(ctx, R.color.ll_border)
+            strokeWidth = dp(1)
         }
 
         val column = LinearLayout(ctx).apply {
@@ -95,20 +96,25 @@ class ShopDetailFragment : Fragment() {
         val nameRow = LinearLayout(ctx).apply { orientation = LinearLayout.HORIZONTAL }
         val nameView = TextView(ctx).apply {
             text = service.name
-            setTextColor(Color.parseColor("#1F2937"))
+            setTextColor(ContextCompat.getColor(ctx, R.color.ll_foreground))
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
             setTypeface(typeface, android.graphics.Typeface.BOLD)
             layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
         }
+        val isPriority = service.serviceType == "PRIORITY"
         val typeBadge = TextView(ctx).apply {
             text = service.serviceType
             setTextColor(
-                if (service.serviceType == "PRIORITY") Color.parseColor("#1E40AF")
-                else Color.parseColor("#374151")
+                ContextCompat.getColor(
+                    ctx,
+                    if (isPriority) R.color.ll_primary else R.color.ll_secondary_foreground
+                )
             )
             setBackgroundColor(
-                if (service.serviceType == "PRIORITY") Color.parseColor("#DBEAFE")
-                else Color.parseColor("#F3F4F6")
+                ContextCompat.getColor(
+                    ctx,
+                    if (isPriority) R.color.ll_primary_muted else R.color.ll_muted
+                )
             )
             setPadding(dp(8), dp(2), dp(8), dp(2))
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 10f)
@@ -117,22 +123,21 @@ class ShopDetailFragment : Fragment() {
         nameRow.addView(nameView)
         nameRow.addView(typeBadge)
 
-        val priceView = TextView(ctx).apply {
-            text = "PHP %.2f".format(service.price)
-            setTextColor(Color.parseColor("#1E40AF"))
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
-            setTypeface(typeface, android.graphics.Typeface.BOLD)
-            (layoutParams as? LinearLayout.LayoutParams)?.topMargin = dp(8)
-        }
         val priceParams = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         ).apply { topMargin = dp(8) }
+        val priceView = TextView(ctx).apply {
+            text = "PHP %.2f".format(service.price)
+            setTextColor(ContextCompat.getColor(ctx, R.color.ll_primary))
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
+            setTypeface(typeface, android.graphics.Typeface.BOLD)
+        }
 
         val bookBtn = MaterialButton(ctx).apply {
             text = "Book This Service"
-            setTextColor(Color.WHITE)
-            setBackgroundColor(Color.parseColor("#1E40AF"))
+            setBackgroundColor(ContextCompat.getColor(ctx, R.color.ll_primary))
+            setTextColor(ContextCompat.getColor(ctx, R.color.ll_primary_foreground))
             setOnClickListener {
                 try {
                     findNavController().navigate(

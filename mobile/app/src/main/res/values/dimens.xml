@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Spacing (aligned with web px-4 / py-8) -->
+    <dimen name="spacing_1">4dp</dimen>
+    <dimen name="spacing_2">8dp</dimen>
+    <dimen name="spacing_3">12dp</dimen>
+    <dimen name="spacing_4">16dp</dimen>
+    <dimen name="spacing_5">20dp</dimen>
+    <dimen name="spacing_6">24dp</dimen>
+    <dimen name="spacing_8">32dp</dimen>
+
+    <!-- Radius (web radius 0.75rem, base 12dp) -->
+    <dimen name="radius_sm">6dp</dimen>
+    <dimen name="radius_md">8dp</dimen>
+    <dimen name="radius_lg">12dp</dimen>
+    <dimen name="radius_xl">16dp</dimen>
+    <dimen name="radius_2xl">24dp</dimen>
+
+    <!-- Layout -->
+    <dimen name="auth_card_max_width">400dp</dimen>
+    <dimen name="toolbar_elevation">0dp</dimen>
+    <dimen name="card_elevation">2dp</dimen>
+    <dimen name="logo_chip_size">40dp</dimen>
+</resources>
