@@ -24,3 +24,35 @@ UPDATE shops
 SET owner_id = '<owner-user-uuid>'
 WHERE name = 'GF22 Laundry Hub';
 ```
+
+## `insert_slots_2026_05_26_27.sql`
+
+Adds **hourly** `slot_configs` for **every shop** and both **STANDARD** and **PRIORITY** services on **2026-05-26** and **2026-05-27**.
+
+| Setting | Value |
+|---------|--------|
+| Dates | 2026-05-26, 2026-05-27 |
+| Hours | 08:00–09:00 through 17:00–18:00 (10 windows per day) |
+| Capacity | `max_slots = 5` per window |
+
+**Expected row count:** `shops × services (STANDARD + PRIORITY) × 2 dates × 10 hours`  
+Example: 5 shops × 2 services × 2 × 10 = **200 rows** (if seed has 5 shops).
+
+Re-running is safe (`ON CONFLICT DO NOTHING` on `shop_id`, `service_id`, `date`, `start_time`, `end_time`).
+
+### Apply
+
+**Supabase SQL editor:** paste the contents of `insert_slots_2026_05_26_27.sql` and run (includes a post-check `SELECT`).
+
+**psql:**
+
+```
+psql "$DATABASE_URL" -f backend/laundrylink/db/insert_slots_2026_05_26_27.sql
+```
+
+### Verify in the app
+
+1. Booking flow: `/shops/{id}/book` → date **May 26 or 27** → time step shows slots (e.g. 8:00 AM–5:00 PM).
+2. API: `GET /api/slots?shopId={uuid}&serviceId={uuid}&date=2026-05-26`
+
+To add more dates (e.g. May 25), duplicate the date `VALUES` in the script and run again.
