@@ -109,7 +109,9 @@
         <action
             android:id="@+id/action_confirmation_to_myBookings"
             app:destination="@id/myBookingsFragment"
-            app:popUpTo="@id/homeFragment" />
+            app:popUpTo="@id/customer_main"
+            app:popUpToInclusive="false"
+            app:launchSingleTop="true" />
     </fragment>
 
 </navigation>

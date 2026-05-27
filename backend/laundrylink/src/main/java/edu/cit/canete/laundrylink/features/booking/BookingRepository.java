@@ -20,6 +20,14 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
 
     List<Booking> findByShop_IdAndBookingDate(UUID shopId, LocalDate bookingDate);
 
+    @Query("""
+        select b from Booking b
+        join fetch b.shop
+        join fetch b.service
+        where b.bookingDate = :bookingDate
+    """)
+    List<Booking> findByBookingDate(@Param("bookingDate") LocalDate bookingDate);
+
     List<Booking> findByShop_IdAndStatus(UUID shopId, BookingStatus status);
 
     List<Booking> findByShop_IdAndBookingDateAndStatus(UUID shopId, LocalDate bookingDate, BookingStatus status);

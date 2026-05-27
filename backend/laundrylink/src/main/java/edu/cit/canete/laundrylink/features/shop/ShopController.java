@@ -31,8 +31,13 @@ public class ShopController {
     }
 
     @GetMapping("/summary")
-    public ResponseEntity<?> listShopsSummary(@RequestParam(required = false) LocalDate date) {
-        return ResponseEntity.ok(responseFactory.success(shopService.listShopsSummary(date)));
+    public ResponseEntity<?> listShopsSummary(
+        @RequestParam(required = false) LocalDate date,
+        @RequestParam(defaultValue = "true") boolean includeSlotAvailability
+    ) {
+        return ResponseEntity.ok(
+            responseFactory.success(shopService.listShopsSummary(date, includeSlotAvailability))
+        );
     }
 
     @GetMapping("/{id}")
