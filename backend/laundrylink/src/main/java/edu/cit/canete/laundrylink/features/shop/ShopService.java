@@ -1,5 +1,6 @@
 package edu.cit.canete.laundrylink.features.shop;
 
+import edu.cit.canete.laundrylink.features.booking.Booking;
 import edu.cit.canete.laundrylink.features.booking.BookingRepository;
 import edu.cit.canete.laundrylink.features.slot.SlotConfig;
 import edu.cit.canete.laundrylink.features.slot.SlotConfigRepository;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ShopService {
@@ -76,11 +78,30 @@ public class ShopService {
     }
 
     public List<Map<String, Object>> listShopsSummary(LocalDate date) {
+        return listShopsSummary(date, true);
+    }
+
+    public List<Map<String, Object>> listShopsSummary(LocalDate date, boolean includeSlotAvailability) {
         LocalDate targetDate = date == null ? LocalDate.now() : date;
         List<Shop> shops = shopRepository.findAll();
 
+        Map<UUID, List<edu.cit.canete.laundrylink.features.shop.Service>> servicesByShop =
+            serviceRepository.findAll().stream()
+                .collect(Collectors.groupingBy(s -> s.getShop().getId()));
+
+        List<SlotConfig> slotConfigsForDate = List.of();
+        List<Booking> bookingsForDate = List.of();
+        if (includeSlotAvailability) {
+            slotConfigsForDate = slotConfigRepository.findByConfigDateWithShopAndService(targetDate);
+            bookingsForDate = bookingRepository.findByBookingDate(targetDate);
+        }
+
+        final List<SlotConfig> slotConfigs = slotConfigsForDate;
+        final List<Booking> bookings = bookingsForDate;
+
         return shops.stream().map(shop -> {
-            List<edu.cit.canete.laundrylink.features.shop.Service> services = serviceRepository.findByShop_Id(shop.getId());
+            List<edu.cit.canete.laundrylink.features.shop.Service> services =
+                servicesByShop.getOrDefault(shop.getId(), List.of());
             List<Map<String, Object>> serviceMaps = new ArrayList<>();
 
             double standardPrice = 0.0;
@@ -105,17 +126,19 @@ public class ShopService {
                         priorityPrice = service.getPrice().doubleValue();
                     }
 
-                    List<SlotConfig> slotConfigs = slotConfigRepository.findByShop_IdAndService_IdAndConfigDate(
-                        shop.getId(),
-                        service.getId(),
-                        targetDate
-                    );
-
-                    for (SlotConfig config : slotConfigs) {
-                        LocalTime start = config.getStartTime() == null ? LocalTime.MIN : config.getStartTime();
-                        LocalTime end = config.getEndTime() == null ? LocalTime.MAX : config.getEndTime();
-                        long reserved = bookingRepository.countForWindow(shop.getId(), service.getId(), targetDate, start, end);
-                        prioritySlots += Math.max(0, config.getMaxSlots() - (int) reserved);
+                    if (includeSlotAvailability) {
+                        UUID shopId = shop.getId();
+                        UUID serviceId = service.getId();
+                        for (SlotConfig config : slotConfigs) {
+                            if (!config.getShop().getId().equals(shopId)
+                                || !config.getService().getId().equals(serviceId)) {
+                                continue;
+                            }
+                            LocalTime start = config.getStartTime() == null ? LocalTime.MIN : config.getStartTime();
+                            LocalTime end = config.getEndTime() == null ? LocalTime.MAX : config.getEndTime();
+                            long reserved = countBookingsInWindow(bookings, shopId, serviceId, start, end);
+                            prioritySlots += Math.max(0, config.getMaxSlots() - (int) reserved);
+                        }
                     }
                 }
             }
@@ -139,5 +162,22 @@ public class ShopService {
             shopMap.put("services", serviceMaps);
             return shopMap;
         }).toList();
+    }
+
+    private static long countBookingsInWindow(
+        List<Booking> bookings,
+        UUID shopId,
+        UUID serviceId,
+        LocalTime start,
+        LocalTime end
+    ) {
+        return bookings.stream()
+            .filter(b -> b.getShop().getId().equals(shopId))
+            .filter(b -> b.getService().getId().equals(serviceId))
+            .filter(b -> {
+                LocalTime slot = b.getTimeSlot();
+                return !slot.isBefore(start) && slot.isBefore(end);
+            })
+            .count();
     }
 }

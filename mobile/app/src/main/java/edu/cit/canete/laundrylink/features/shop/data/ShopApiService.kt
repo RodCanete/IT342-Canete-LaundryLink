@@ -14,7 +14,8 @@ interface ShopApiService {
 
     @GET("shops/summary")
     suspend fun getShopsSummary(
-        @Query("date") date: String? = null
+        @Query("date") date: String? = null,
+        @Query("includeSlotAvailability") includeSlotAvailability: Boolean = false
     ): Response<ApiResponse<List<ShopSummary>>>
 
     @GET("shops/{id}")

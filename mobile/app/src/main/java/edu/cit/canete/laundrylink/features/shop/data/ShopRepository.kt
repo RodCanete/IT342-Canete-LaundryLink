@@ -10,9 +10,12 @@ class ShopRepository {
 
     private val api = RetrofitClient.shopApiService
 
-    suspend fun getShopsSummary(date: String? = null): Result<List<ShopSummary>> =
+    suspend fun getShopsSummary(
+        date: String? = null,
+        includeSlotAvailability: Boolean = false
+    ): Result<List<ShopSummary>> =
         runCatching {
-            val response = api.getShopsSummary(date)
+            val response = api.getShopsSummary(date, includeSlotAvailability)
             if (response.isSuccessful && response.body() != null) {
                 response.body()!!.data ?: emptyList()
             } else {
